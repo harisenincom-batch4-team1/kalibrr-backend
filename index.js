@@ -1,15 +1,22 @@
 const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-const port = process.env.APP_PORT;
-const key = process.env.APP_KEY;
+app.use(express.json());
+app.use(cors());
 
-app.get(`/key=${key}`, (_, res) => {
+const port = process.env.APP_PORT;
+
+app.get(`/`, (_, res) => {
   return res.status(200).send({
     message: "kalibrr job portal api",
   });
 });
+
+const usersRoute = require("./src/api/user/router");
+
+app.use(usersRoute);
 
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
