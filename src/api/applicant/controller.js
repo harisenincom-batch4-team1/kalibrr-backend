@@ -1,4 +1,4 @@
-const { User, Applicant } = require("../../models");
+const { Applicant } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 
@@ -41,10 +41,30 @@ const createApplicant = async (req, res) => {
     });
     return res
       .status(201)
-      .send(responseData(201, "Berhasil membuat surat", null, result));
+      .send(responseData(201, "Berhasil membuat CV", null, result));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
 };
 
-module.exports = { getAllApplicant, getOneApplicant, createApplicant };
+const deleteApplicant = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const check = await Applicant.findOne({
+      where: { id },
+    });
+    if (!check) {
+      return res
+        .status(200)
+        .send(responseData(404, "CV Tidak ditemukan", null, null));
+    }
+    await Applicant.destroy({
+      where: { id },
+    });
+    return res.status(200).send(responseData(200, "OK", null, null));
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
+
+module.exports = { getAllApplicant, getOneApplicant, createApplicant, deleteApplicant };

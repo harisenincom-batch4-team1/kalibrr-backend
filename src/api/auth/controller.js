@@ -12,6 +12,17 @@ const registerUser = async (req, res) => {
         .status(500)
         .send(responseData(500, "Mohon Lengkapi Data Diri", null, null));
     }
+
+    const checkEmail = await User.findOne({
+      where: { email },
+    });
+
+    if (checkEmail) {
+      return res
+      .status(500)
+      .send(responseData(500, "Email sudah digunakan", null, null));
+    }
+
     const passwordHash = await passwordHashing(password);
     await User.create({
       name,
