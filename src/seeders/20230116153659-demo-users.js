@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     /**
      * Add seed commands here.
      *
@@ -11,31 +11,31 @@ module.exports = {
      *   name: 'John Doe',
      *   isBetaMember: false
      * }], {});
-    */
-    const users = [];
+     */
+    const User = [];
     for (let i = 0; i < 50; i++) {
-      users.push({
+      User.push({
         id: i,
-        fullname: `employe${i}`,
-        username:  `analis`,
-        email: `0876787667898`,
-        password: 'alamat employe',
+        name: `user${i}`,
+        username: `user${i + i}`,
+        email: `user${i}@mail.com`,
+        password: "123456",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
     }
-    return queryInterface.bulkInsert('Users', users, {});
+    return queryInterface.bulkInsert("User", User, {});
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.
      *
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    return queryInterface.bulkDelete('Users', null, {
-      truncate: true
+    return queryInterface.bulkDelete("User", null, {
+      truncate: true,
     });
-  }
+  },
 };

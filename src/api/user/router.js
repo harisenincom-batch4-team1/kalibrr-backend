@@ -1,8 +1,9 @@
 const express = require("express");
-const { getAllUsers } = require("./controller");
+const auth = require("../../middlewares/auth");
+const { deleteUser } = require("./controller");
 
 const route = express();
 
-route.get("/api/v1/users", getAllUsers);
+route.delete("/api/v1/user", auth, deleteUser);
 
 module.exports = route;
