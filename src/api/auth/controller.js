@@ -5,9 +5,9 @@ const passwordCompare = require("../../helpers/passwordCompare");
 const generateToken = require("../../helpers/generateToken");
 
 const registerUser = async (req, res) => {
-  const { name, username, email, password } = req.body;
+  const { name, email, password } = req.body;
   try {
-    if (!name && !username && !password && !email) {
+    if (!name && !password && !email) {
       return res
         .status(500)
         .send(responseData(500, "Mohon Lengkapi Data Diri", null, null));
@@ -26,7 +26,6 @@ const registerUser = async (req, res) => {
     const passwordHash = await passwordHashing(password);
     await User.create({
       name,
-      username,
       email,
       password: passwordHash,
     });

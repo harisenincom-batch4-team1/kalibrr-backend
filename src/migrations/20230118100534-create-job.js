@@ -18,14 +18,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      description: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      qualification: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       type: {
         type: Sequelize.STRING,
         allowNull: false,

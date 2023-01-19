@@ -17,7 +17,7 @@ const getAllApplicant = async (req, res) => {
 const getOneApplicant = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await Applicant.findAll({
+    const result = await Applicant.findOne({
       where: { id },
     });
     return res.status(200).send(responseData(200, "OK", null, result));

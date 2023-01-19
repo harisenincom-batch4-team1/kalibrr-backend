@@ -31,6 +31,12 @@ const updateUser = async (req, res) => {
   const { name, role, photo, linkedinUrl, skill } = req.body;
 
   try {
+    if (!name && !role && !photo && !linkedinUrl && !skill) {
+      return res
+        .status(500)
+        .send(responseData(500, "Mohon isi data dengan benar", null, null));
+    }
+
     const checkId = await User.findOne({
       where: { id },
     });
@@ -112,10 +118,10 @@ const updateEmailUser = async (req, res) => {
 
 const updatePasswordUser = async (req, res) => {
   const id = checkToken(req);
-  const { passwordNow, passwordNew, confirmPassword } = req.body;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
 
   try {
-    if (!passwordNew && !confirmPassword) {
+    if (!newPassword && !confirmPassword) {
       return res
         .status(500)
         .send(responseData(500, "Mohon isi data dengan benar", null, null));
@@ -131,7 +137,7 @@ const updatePasswordUser = async (req, res) => {
         .send(responseData(404, "Akun tidak ditemukan", null, null));
     }
 
-    const checkPassword = await passwordCompare(passwordNow, checkId.password);
+    const checkPassword = await passwordCompare(currentPassword, checkId.password);
 
     if (!checkPassword) {
       return res
@@ -139,13 +145,13 @@ const updatePasswordUser = async (req, res) => {
         .send(responseData(500, "Password salah", null, null));
     }
 
-    if (passwordNew !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       return res
       .status(404)
       .send(responseData(500, "Password dan konfirmasi password tidak cocok", null, null));
     }
 
-    const passwordHash = await passwordHashing(passwordNew)
+    const passwordHash = await passwordHashing(newPassword)
 
     const values = {
       password: passwordHash,

@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class JobApplication extends Model {
     /**
@@ -19,47 +17,50 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  JobApplication.init({
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER,
+  JobApplication.init(
+    {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+      applicantId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: "Applicant", key: "id" },
+      },
+      jobId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: "Job", key: "id" },
+      },
+      status: {
+        type: DataTypes.ENUM,
+        values: [
+          "onreview",
+          "selected",
+          "interview",
+          "test",
+          "offering",
+          "recruited",
+          "rejected",
+        ],
+        defaultValue: "onreview",
+      },
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+      },
     },
-    applicantId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: "Applicant", key: "id" },
-    },
-    jobId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: "Job", key: "id" },
-    },
-    status: {
-      type: DataTypes.ENUM,
-      values: [
-        "onreview",
-        "selected",
-        "interview",
-        "test",
-        "offering",
-        "recruited",
-        "rejected",
-      ],
-      defaultValue: "onreview",
-    },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE,
-    },
-    updatedAt: {
-      allowNull: false,
-      type: DataTypes.DATE,
-    },
-  }, {
-    sequelize,
-    modelName: 'JobApplication',
-  });
+    {
+      sequelize,
+      modelName: "JobApplication",
+    }
+  );
   return JobApplication;
 };

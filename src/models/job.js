@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
       models.Job.hasMany(models.JobApplication, {
         foreignKey: "jobId",
       });
+      models.Job.hasMany(models.JobQualification, {
+        foreignKey: "qualificationId",
+      });
+      models.Job.hasMany(models.JobSaved, {
+        foreignKey: "jobId",
+      });
     }
   }
   Job.init(
@@ -34,14 +40,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      description: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      qualification: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       type: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -52,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       status: {
         type: DataTypes.BOOLEAN,
-        allowNull: false
+        allowNull: false,
       },
       salaryMin: {
         type: DataTypes.BIGINT,
