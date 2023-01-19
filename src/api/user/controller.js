@@ -1,13 +1,26 @@
-const { User } = require("../../models");
+const { Users } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordCompare = require("../../helpers/passwordCompare");
 const passwordHashing = require("../../helpers/passwordHashing");
 
+const getDetailUser = async (req, res) => {
+  const id = checkToken(req);
+  try {
+    const result = await Users.findOne({
+      where: { id },
+      attributes: ["id", "name", "email", "location", "phone", "role", "linkedinUrl", "photo", "skill", "createdAt", "updatedAt"]
+    });
+    return res.status(200).send(responseData(200, "OK", null, result));
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
+
 const deleteUser = async (req, res) => {
   const id = checkToken(req);
   try {
-    const result = await User.findOne({
+    const result = await Users.findOne({
       where: { id: id },
     });
     if (!result) {
@@ -15,7 +28,7 @@ const deleteUser = async (req, res) => {
         .status(404)
         .send(responseData(404, "Akun tidak ditemukan", null, null));
     }
-    await User.destroy({
+    await Users.destroy({
       where: { id: id },
     });
     return res
@@ -28,16 +41,10 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const id = checkToken(req);
-  const { name, role, photo, linkedinUrl, skill } = req.body;
+  const { name, location, role, phone, linkedinUrl, skill } = req.body;
 
   try {
-    if (!name && !role && !photo && !linkedinUrl && !skill) {
-      return res
-        .status(500)
-        .send(responseData(500, "Mohon isi data dengan benar", null, null));
-    }
-
-    const checkId = await User.findOne({
+    const checkId = await Users.findOne({
       where: { id },
     });
 
@@ -49,8 +56,9 @@ const updateUser = async (req, res) => {
 
     const values = {
       name,
+      location,
       role,
-      photo,
+      phone,
       linkedinUrl,
       skill,
     };
@@ -59,7 +67,7 @@ const updateUser = async (req, res) => {
         id: id,
       },
     };
-    await User.update(values, selector);
+    await Users.update(values, selector);
 
     return res
       .status(201)
@@ -80,7 +88,7 @@ const updateEmailUser = async (req, res) => {
         .send(responseData(500, "Mohon isi data dengan benar", null, null));
     }
 
-    const checkId = await User.findOne({
+    const checkId = await Users.findOne({
       where: { id },
     });
 
@@ -106,7 +114,7 @@ const updateEmailUser = async (req, res) => {
         id: id,
       },
     };
-    await User.update(values, selector);
+    await Users.update(values, selector);
 
     return res
       .status(201)
@@ -127,7 +135,7 @@ const updatePasswordUser = async (req, res) => {
         .send(responseData(500, "Mohon isi data dengan benar", null, null));
     }
 
-    const checkId = await User.findOne({
+    const checkId = await Users.findOne({
       where: { id },
     });
 
@@ -137,7 +145,10 @@ const updatePasswordUser = async (req, res) => {
         .send(responseData(404, "Akun tidak ditemukan", null, null));
     }
 
-    const checkPassword = await passwordCompare(currentPassword, checkId.password);
+    const checkPassword = await passwordCompare(
+      currentPassword,
+      checkId.password
+    );
 
     if (!checkPassword) {
       return res
@@ -147,11 +158,18 @@ const updatePasswordUser = async (req, res) => {
 
     if (newPassword !== confirmPassword) {
       return res
-      .status(404)
-      .send(responseData(500, "Password dan konfirmasi password tidak cocok", null, null));
+        .status(404)
+        .send(
+          responseData(
+            500,
+            "Password dan konfirmasi password tidak cocok",
+            null,
+            null
+          )
+        );
     }
 
-    const passwordHash = await passwordHashing(newPassword)
+    const passwordHash = await passwordHashing(newPassword);
 
     const values = {
       password: passwordHash,
@@ -161,7 +179,7 @@ const updatePasswordUser = async (req, res) => {
         id: id,
       },
     };
-    await User.update(values, selector);
+    await Users.update(values, selector);
 
     return res
       .status(201)
@@ -169,6 +187,12 @@ const updatePasswordUser = async (req, res) => {
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
-}
+};
 
-module.exports = { deleteUser, updateUser, updateEmailUser, updatePasswordUser };
+module.exports = {
+  getDetailUser,
+  deleteUser,
+  updateUser,
+  updateEmailUser,
+  updatePasswordUser,
+};

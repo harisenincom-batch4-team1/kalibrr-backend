@@ -21,6 +21,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      location: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      phone: {
+        type: Sequelize.BIGINT,
+        allowNull: true,
+      },
       role: {
         type: Sequelize.STRING,
         allowNull: true,

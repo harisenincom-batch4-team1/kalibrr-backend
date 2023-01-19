@@ -1,4 +1,4 @@
-const { User } = require("../../models");
+const { Users } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const passwordHashing = require("../../helpers/passwordHashing");
 const passwordCompare = require("../../helpers/passwordCompare");
@@ -13,7 +13,7 @@ const registerUser = async (req, res) => {
         .send(responseData(500, "Mohon Lengkapi Data Diri", null, null));
     }
 
-    const checkEmail = await User.findOne({
+    const checkEmail = await Users.findOne({
       where: { email },
     });
 
@@ -24,7 +24,7 @@ const registerUser = async (req, res) => {
     }
 
     const passwordHash = await passwordHashing(password);
-    await User.create({
+    await Users.create({
       name,
       email,
       password: passwordHash,
@@ -46,7 +46,7 @@ const loginUser = async (req, res) => {
         .send(responseData(500, "Form tidak boleh kosong", null, null));
     }
 
-    const checkData = await User.findOne({
+    const checkData = await Users.findOne({
       where: { email: email },
     });
 

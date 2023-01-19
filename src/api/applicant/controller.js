@@ -1,11 +1,11 @@
-const { Applicant } = require("../../models");
+const { Applicants } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 
 const getAllApplicant = async (req, res) => {
   const id = checkToken(req);
   try {
-    const result = await Applicant.findAll({
+    const result = await Applicants.findAll({
       where: { userId: id },
     });
     return res.status(200).send(responseData(200, "OK", null, result));
@@ -17,7 +17,7 @@ const getAllApplicant = async (req, res) => {
 const getOneApplicant = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await Applicant.findOne({
+    const result = await Applicants.findOne({
       where: { id },
     });
     return res.status(200).send(responseData(200, "OK", null, result));
@@ -35,7 +35,7 @@ const createApplicant = async (req, res) => {
         .status(500)
         .send(responseData(500, "Mohon isi data dengan benar", null, null));
     }
-    const result = await Applicant.create({
+    const result = await Applicants.create({
       userId: id,
       cv,
     });
@@ -50,7 +50,7 @@ const createApplicant = async (req, res) => {
 const deleteApplicant = async (req, res) => {
   try {
     const { id } = req.params;
-    const check = await Applicant.findOne({
+    const check = await Applicants.findOne({
       where: { id },
     });
     if (!check) {
@@ -58,7 +58,7 @@ const deleteApplicant = async (req, res) => {
         .status(200)
         .send(responseData(404, "CV Tidak ditemukan", null, null));
     }
-    await Applicant.destroy({
+    await Applicants.destroy({
       where: { id },
     });
     return res.status(200).send(responseData(200, "OK", null, null));
