@@ -79,10 +79,10 @@ const updateUser = async (req, res) => {
 
 const updateEmailUser = async (req, res) => {
   const id = checkToken(req);
-  const { email, password } = req.body;
+  const { email, currentPassword } = req.body;
 
   try {
-    if (!email && !password) {
+    if (!email && !currentPassword) {
       return res
         .status(500)
         .send(responseData(500, "Mohon isi data dengan benar", null, null));
@@ -98,11 +98,11 @@ const updateEmailUser = async (req, res) => {
         .send(responseData(404, "Akun tidak ditemukan", null, null));
     }
 
-    const checkPassword = await passwordCompare(password, checkId.password);
+    const checkPassword = await passwordCompare(currentPassword, checkId.password);
 
     if (!checkPassword) {
       return res
-        .status(404)
+        .status(500)
         .send(responseData(500, "Password salah", null, null));
     }
 

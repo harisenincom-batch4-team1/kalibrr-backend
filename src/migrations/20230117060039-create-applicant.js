@@ -15,7 +15,7 @@ module.exports = {
         references: { model: "Users", key: "id" },
       },
       cv: {
-        type: Sequelize.STRING,
+        type: Sequelize.BLOB,
         allowNull: true,
       },
       createdAt: {
