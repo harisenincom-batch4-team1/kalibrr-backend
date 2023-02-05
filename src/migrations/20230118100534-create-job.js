@@ -38,6 +38,12 @@ module.exports = {
         type: Sequelize.BIGINT,
         allowNull: false
       },
+      jobDescription: {
+        type: Sequelize.TEXT
+      },
+      jobQualification: {
+        type: Sequelize.TEXT
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

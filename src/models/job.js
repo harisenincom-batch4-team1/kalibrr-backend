@@ -58,6 +58,12 @@ module.exports = (sequelize, DataTypes) => {
       salaryMax: {
         type: DataTypes.BIGINT,
       },
+      jobDescription: {
+        type: DataTypes.TEXT
+      },
+      jobQualification: {
+        type: DataTypes.TEXT
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
