@@ -2,11 +2,17 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+const port = process.env.APP_PORT || 9000;
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = process.env.APP_PORT || 8080;
+const v1 = "/api/v1";
+const publicRoute = require("./src/api/public/router");
+const userRoute = require("./src/api/user/router");
+const companyRoute = require("./src/api/company/router");
+const authRoute = require("./src/api/auth/router");
 
 app.get("/", (_, res) => {
   return res.status(200).send({
@@ -14,15 +20,11 @@ app.get("/", (_, res) => {
   });
 });
 
-const superAdmin = require("./src/api/super_admin/router");
-const UserRoute = require("./src/api/user/router");
-const applicantRoute = require("./src/api/applicant/router");
-const authRoute = require("./src/api/auth/router");
+app.use(v1, publicRoute);
+app.use(v1, authRoute);
 
-app.use(superAdmin);
-app.use(UserRoute);
-app.use(applicantRoute);
-app.use(authRoute);
+app.use(v1, userRoute);
+app.use(v1, companyRoute);
 
 app.listen(port, () => {
   console.log(`server running on port ${port}`);

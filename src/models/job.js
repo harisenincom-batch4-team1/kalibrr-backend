@@ -15,9 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       models.Jobs.hasMany(models.JobApplications, {
         foreignKey: "jobId",
       });
-      models.Jobs.hasMany(models.JobQualifications, {
-        foreignKey: "qualificationId",
-      });
       models.Jobs.hasMany(models.JobSaveds, {
         foreignKey: "jobId",
       });
