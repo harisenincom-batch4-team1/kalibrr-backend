@@ -269,14 +269,28 @@ const deleteResume = async (req, res) => {
   }
 };
 
+const getApply = async (req, res) => {
+  const id = checkToken(req);
+  try {
+    const checkResume = await Applicants.findOne({ where: { userId: id } });
+    if (!checkResume) {
+      return res.status(200).send(responseData(200, "OK", null, []));
+    }
+    const result = await JobApplications.findAll({
+      where: { applicantId: checkResume.userId },
+    });
+    return res.status(200).send(responseData(200, "OK", null, result));
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
+
 const apply = async (req, res) => {
-  const { jobId } = req.body;
-  const applicantId = checkToken(req);
+  const { jobId, applicantId } = req.body;
   try {
     const checkResume = await Applicants.findOne({
       where: { userId: applicantId },
     });
-
     if (!checkResume) {
       return res
         .status(404)
@@ -286,7 +300,7 @@ const apply = async (req, res) => {
     const checkJob = await Jobs.findOne({
       where: { id: jobId },
     });
-
+    console.log("job id: ", checkJob?.id);
     if (!checkJob) {
       return res
         .status(404)
@@ -294,17 +308,12 @@ const apply = async (req, res) => {
     }
 
     const checkMultiApplyJob = await JobApplications.findOne({
-      where: { jobId: jobId },
+      where: { jobId: jobId, applicantId: applicantId },
     });
-
-    // const checkMultiApplyUser = await JobApplications.findOne({
-    //   where: { applicantId: checkResume.userId },
-    // });
-
-    // console.log("res => ", checkMultiApplyJob);
-    console.log(checkResume.userId, checkJob.id);
-
-    if (!checkMultiApplyJob) {
+    if (
+      checkMultiApplyJob?.jobId !== jobId ||
+      checkMultiApplyJob?.applicantId !== applicantId
+    ) {
       await JobApplications.create({
         applicantId: checkResume.userId,
         jobId: checkJob.id,
@@ -315,7 +324,8 @@ const apply = async (req, res) => {
     }
 
     if (
-      checkMultiApplyJob.jobId == jobId
+      checkMultiApplyJob?.jobId === jobId ||
+      checkMultiApplyJob?.applicantId === applicantId
     ) {
       return res
         .status(500)
@@ -328,22 +338,10 @@ const apply = async (req, res) => {
           )
         );
     }
-  } catch (error) {
-    return res.status(500).send(responseData(500, null, error?.message, null));
-  }
-};
 
-const getApply = async (req, res) => {
-  const id = checkToken(req);
-  try {
-    const checkResume = await Applicants.findOne({ where: { userId: id } });
-    if (!checkResume) {
-      return res.status(200).send(responseData(200, "OK", null, []));
-    }
-    const result = await JobApplications.findAll({
-      where: { applicantId: checkResume.userId },
-    });
-    return res.status(200).send(responseData(200, "OK", null, result));
+    return res
+      .status(200)
+      .send(responseData(200, "Missing out of controller", null, null));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }

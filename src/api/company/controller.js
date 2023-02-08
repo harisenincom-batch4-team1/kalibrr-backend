@@ -342,14 +342,14 @@ const updateJob = async (req, res) => {
     }
 
     if (
-      (!name,
-      !type,
-      !tenure,
-      !status,
-      !salaryMin,
-      !salaryMax,
-      !jobDescription,
-      !jobQualification)
+      name === "" ||
+      type === "" ||
+      tenure === "" ||
+      status === "" ||
+      salaryMin === "" ||
+      salaryMax === "" ||
+      jobDescription === "" ||
+      jobQualification === ""
     ) {
       return res
         .status(500)
