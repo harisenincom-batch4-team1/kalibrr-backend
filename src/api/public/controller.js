@@ -23,6 +23,7 @@ const getAllJob = async (_, res) => {
       include: [
         {
           model: Companies,
+          attributes: { exclude: ["password"] },
         },
       ],
     });
@@ -38,10 +39,18 @@ const getOneJob = async (req, res) => {
 
     const check = await Jobs.findOne({
       where: { id },
+      include: [
+        {
+          model: Companies,
+          attributes: { exclude: ["password"] },
+        },
+      ],
     });
 
     if (!check) {
-      return res.status(404).send(responseData(404, "Lowongan kerja tidak ditemukan", null, null));
+      return res
+        .status(404)
+        .send(responseData(404, "Lowongan kerja tidak ditemukan", null, null));
     }
 
     const result = await Jobs.findOne({
@@ -65,6 +74,11 @@ const getCompanyDetail = async (req, res) => {
 
     const checkCompany = await Companies.findOne({
       where: { id },
+      include: [
+        {
+          attributes: { exclude: ["password"] },
+        },
+      ],
     });
 
     if (!checkCompany) {
