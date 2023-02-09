@@ -1,4 +1,4 @@
-const { Jobs, Companies } = require("../../models");
+const { Jobs, Companies, JobApplications } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordHashing = require("../../helpers/passwordHashing");
@@ -379,6 +379,40 @@ const updateJob = async (req, res) => {
   }
 };
 
+const getUserApply = async (req, res) => {
+  try {
+    const id = checkToken(req);
+    const result = await Jobs.findAll({
+      where: { companyId: id },
+      include: [JobApplications],
+    });
+    return res.status(200).send(responseData(200, "OK", null, result));
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
+
+const updateApplyStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const values = {
+      status,
+    };
+    const selector = {
+      where: {
+        id: id,
+      },
+    };
+    await JobApplications.update(values, selector);
+
+    return res.status(201).send(responseData(200, "Berhasil update status pelamar", null, null))
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
+
 module.exports = {
   getDetailCompany,
   deleteCompany,
@@ -390,4 +424,6 @@ module.exports = {
   getOneJob,
   deleteJob,
   updateJob,
+  getUserApply,
+  updateApplyStatus,
 };

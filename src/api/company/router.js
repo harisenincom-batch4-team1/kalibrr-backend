@@ -10,7 +10,9 @@ const {
   getOneJob,
   createJob,
   deleteJob,
-  updateJob
+  updateJob,
+  getUserApply,
+  updateApplyStatus
 } = require("./controller");
 
 const route = express();
@@ -26,5 +28,8 @@ route.get("/company-job/:id", auth, getOneJob);
 route.post("/company-job", auth, createJob);
 route.delete("/company-job/:id", auth, deleteJob);
 route.put("/company-job/:id", auth, updateJob);
+
+route.get("/company-apply", auth, getUserApply);
+route.put("/company-apply/:id", auth, updateApplyStatus);
 
 module.exports = route;
