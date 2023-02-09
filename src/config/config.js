@@ -3,7 +3,7 @@ dotenv.config();
 
 const config = {
   development: {
-    username: process.env.DEVELOPMENT_MYSQL_USERNAME,
+    username: "root",
     password: process.env.DEVELOPMENT_MYSQL_PASSWORD,
     database: "kalibrr",
     host: process.env.DEVELOPMENT_MYSQL_HOST,

@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Users, Applicants, Jobs, Companies } = require("../../models");
 const responseData = require("../../helpers/responseData");
 
@@ -17,17 +18,53 @@ const getAllUser = async (_, res) => {
   }
 };
 
-const getAllJob = async (_, res) => {
+const getAllJob = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const offset = limit * page;
+    const totalRows = await Jobs.count({
+      where: {
+        [Op.or]: [
+          {
+            name: {
+              [Op.like]: "%" + search + "%",
+            },
+          },
+        ],
+      },
+    });
+    const totalPage = Math.ceil(totalRows / limit);
+
     const result = await Jobs.findAll({
+      where: {
+        [Op.or]: [
+          {
+            name: {
+              [Op.like]: "%" + search + "%",
+            },
+          },
+        ],
+      },
       include: [
         {
           model: Companies,
           attributes: { exclude: ["password"] },
         },
       ],
+      offset: offset,
+      limit: limit,
+      order: [["id", "DESC"]],
     });
-    return res.status(200).send(responseData(200, "OK", null, result));
+    const datas = {
+      result: result,
+      page: page,
+      limit: limit,
+      totalRows: totalPage,
+      totalPage: totalPage,
+    };
+    return res.status(200).send(responseData(200, "OK", null, datas));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
