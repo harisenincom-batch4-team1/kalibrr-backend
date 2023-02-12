@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       models.Companies.hasMany(models.Jobs, {
         foreignKey: "companyId",
       });
-      models.Companies.hasMany(models.Messages, {
-        foreignKey: "companyId",
-      });
+      // models.Companies.hasMany(models.Messages, {
+      //   foreignKey: "companyId",
+      // });
     }
   }
   Companies.init(

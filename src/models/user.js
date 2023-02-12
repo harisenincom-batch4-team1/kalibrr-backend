@@ -9,15 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      models.Users.hasMany(models.Applicants, {
+      models.Users.hasMany(models.JobApplications, {
         foreignKey: "userId",
       });
-      models.Users.hasMany(models.JobSaveds, {
-        foreignKey: "userId",
-      });
-      models.Users.hasMany(models.Messages, {
-        foreignKey: "userId",
-      });
+      // models.Users.hasMany(models.JobSaveds, {
+      //   foreignKey: "userId",
+      // });
+      // models.Users.hasMany(models.Messages, {
+      //   foreignKey: "userId",
+      // });
     }
   }
   Users.init(
@@ -62,6 +62,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       linkedinUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      resume: {
         type: DataTypes.STRING,
         allowNull: true,
       },

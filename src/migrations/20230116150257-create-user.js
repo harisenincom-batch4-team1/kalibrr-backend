@@ -46,6 +46,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      resume: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

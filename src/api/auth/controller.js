@@ -7,7 +7,7 @@ const generateToken = require("../../helpers/generateToken");
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   try {
-    if (!name && !password && !email) {
+    if (!name || !password || !email) {
       return res
         .status(500)
         .send(responseData(500, "Mohon Lengkapi Data Diri", null, null));
@@ -40,7 +40,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    if (!email && !password) {
+    if (!email || !password) {
       return res
         .status(500)
         .send(responseData(500, "Form tidak boleh kosong", null, null));
@@ -53,7 +53,7 @@ const loginUser = async (req, res) => {
     if (!checkData) {
       return res
         .status(401)
-        .send(responseData(401, "Email atau password salah", null, null));
+        .send(responseData(401, "Email salah", null, null));
     }
 
     const checkPassword = await passwordCompare(password, checkData.password);
@@ -61,7 +61,7 @@ const loginUser = async (req, res) => {
     if (!checkPassword) {
       return res
         .status(401)
-        .send(responseData(401, "Email atau password salah", null, null));
+        .send(responseData(401, "Password salah", null, null));
     }
 
     const userData = {
