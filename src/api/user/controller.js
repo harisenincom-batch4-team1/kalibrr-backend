@@ -204,11 +204,13 @@ const updatePasswordUser = async (req, res) => {
   }
 };
 
+// check resume is already have or not
 const getAllResume = async (req, res) => {
   const id = checkToken(req);
   try {
-    const result = await Applicants.findAll({
-      where: { userId: id },
+    const result = await Users.findAll({
+      // where: { userId: id },
+      attributes: ['resume'],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
@@ -216,34 +218,56 @@ const getAllResume = async (req, res) => {
   }
 };
 
-const getOneResume = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await Applicants.findOne({
-      where: { id },
-    });
-    return res.status(200).send(responseData(200, "OK", null, result));
-  } catch (error) {
-    return res.status(500).send(responseData(500, null, error?.message, null));
-  }
-};
+// const getOneResume = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const result = await JobApplications.findOne({
+//       where: { id },
+//     });
+//     return res.status(200).send(responseData(200, "OK", null, result));
+//   } catch (error) {
+//     return res.status(500).send(responseData(500, null, error?.message, null));
+//   }
+// };
 
 const createResume = async (req, res) => {
   const id = checkToken(req);
-  const { cv } = req.body;
+  const resume = req.file.path; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
+  // console.log(resume);
   try {
-    if (!cv) {
+    const checkId = await Users.findOne({
+      where: {
+        id: id
+      }
+    });
+
+    if (!checkId) {
       return res
         .status(500)
-        .send(responseData(500, "Mohon isi data dengan benar", null, null));
+        .send(responseData(500, "Akun tidak ditemukan", null, null));
     }
-    const result = await Applicants.create({
-      userId: id,
-      cv,
-    });
+
+    if (!resume) {
+      return res
+        .status(500)
+        .send(responseData(500, "CV belum diinput", null, null));
+    }
+
+    const values = {
+      resume,
+    };
+
+    const selector = {
+      where: {
+        id: id,
+      },
+    };
+
+    const result = await Users.update(values, selector);
+
     return res
       .status(201)
-      .send(responseData(201, "Berhasil membuat CV", null, result));
+      .send(responseData(201, "CV telah diinput", null, result));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
@@ -252,7 +276,7 @@ const createResume = async (req, res) => {
 const deleteResume = async (req, res) => {
   try {
     const { id } = req.params;
-    const check = await Applicants.findOne({
+    const check = await JobApplications.findOne({
       where: { id },
     });
     if (!check) {
@@ -272,7 +296,7 @@ const deleteResume = async (req, res) => {
 const getApply = async (req, res) => {
   const id = checkToken(req);
   try {
-    const checkResume = await Applicants.findOne({ where: { userId: id } });
+    const checkResume = await JobApplications.findOne({ where: { userId: id } });
     if (!checkResume) {
       return res.status(200).send(responseData(200, "OK", null, []));
     }
@@ -288,7 +312,7 @@ const getApply = async (req, res) => {
 const apply = async (req, res) => {
   const { jobId, applicantId } = req.body;
   try {
-    const checkResume = await Applicants.findOne({
+    const checkResume = await JobApplications.findOne({
       where: { userId: applicantId },
     });
     if (!checkResume) {
@@ -354,7 +378,7 @@ module.exports = {
   updateEmailUser,
   updatePasswordUser,
   getAllResume,
-  getOneResume,
+  // getOneResume,
   createResume,
   deleteResume,
   apply,
