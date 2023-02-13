@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  getAllUser,
+  // getAllUser,
   getCompanyDetail,
   getAllJob,
   getOneJob,
@@ -8,7 +8,7 @@ const {
 
 const route = express();
 
-route.get("/user", getAllUser);
+// route.get("/user", getAllUser);
 route.get("/job", getAllJob);
 route.get("/job/:id", getOneJob);
 route.get("/company/:id", getCompanyDetail);

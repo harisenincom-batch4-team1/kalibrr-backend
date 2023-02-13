@@ -1,8 +1,10 @@
-const { Users, Applicants, JobApplications, Jobs } = require("../../models");
+const { Users, JobApplications, Jobs } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordCompare = require("../../helpers/passwordCompare");
 const passwordHashing = require("../../helpers/passwordHashing");
+
+
 
 const getDetailUser = async (req, res) => {
   const id = checkToken(req);
@@ -208,8 +210,8 @@ const updatePasswordUser = async (req, res) => {
 const getAllResume = async (req, res) => {
   const id = checkToken(req);
   try {
-    const result = await Users.findAll({
-      // where: { userId: id },
+    const result = await Users.findOne({
+      where: { id: id },
       attributes: ['resume'],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
@@ -232,8 +234,8 @@ const getAllResume = async (req, res) => {
 
 const createResume = async (req, res) => {
   const id = checkToken(req);
-  const resume = req.file.path; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
-  // console.log(resume);
+  const resume = req.file.filename; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
+  console.log(resume);
   try {
     const checkId = await Users.findOne({
       where: {
@@ -265,33 +267,35 @@ const createResume = async (req, res) => {
 
     const result = await Users.update(values, selector);
 
-    return res
+    res
       .status(201)
       .send(responseData(201, "CV telah diinput", null, result));
+
+    return result;
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
 };
 
-const deleteResume = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const check = await JobApplications.findOne({
-      where: { id },
-    });
-    if (!check) {
-      return res
-        .status(200)
-        .send(responseData(404, "CV Tidak ditemukan", null, null));
-    }
-    await Applicants.destroy({
-      where: { id },
-    });
-    return res.status(200).send(responseData(200, "OK", null, null));
-  } catch (error) {
-    return res.status(500).send(responseData(500, null, error?.message, null));
-  }
-};
+// const deleteResume = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const check = await JobApplications.findOne({
+//       where: { id },
+//     });
+//     if (!check) {
+//       return res
+//         .status(200)
+//         .send(responseData(404, "CV Tidak ditemukan", null, null));
+//     }
+//     await Applicants.destroy({
+//       where: { id },
+//     });
+//     return res.status(200).send(responseData(200, "OK", null, null));
+//   } catch (error) {
+//     return res.status(500).send(responseData(500, null, error?.message, null));
+//   }
+// };
 
 const getApply = async (req, res) => {
   const id = checkToken(req);
@@ -380,7 +384,7 @@ module.exports = {
   getAllResume,
   // getOneResume,
   createResume,
-  deleteResume,
+  // deleteResume,
   apply,
   getApply,
 };

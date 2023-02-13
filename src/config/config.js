@@ -8,6 +8,10 @@ const config = {
     database: "kalibrr",
     host: process.env.DEVELOPMENT_MYSQL_HOST,
     dialect: "mysql",
+    dialectOptions: {
+      useUTC: false, // for reading from database
+    },
+    timezone: '+07:00',
   },
   production: {
     username: process.env.PRODUCTION_MYSQL_USERNAME,
@@ -15,6 +19,10 @@ const config = {
     database: process.env.PRODUCTION_MYSQL_DATABASE,
     host: process.env.PRODUCTION_MYSQL_HOST,
     dialect: "mysql",
+    dialectOptions: {
+      useUTC: false, // for reading from database
+    },
+    timezone: '+07:00',
   },
 };
 

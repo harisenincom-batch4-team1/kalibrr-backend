@@ -7,12 +7,13 @@ const {
   updateEmailUser,
   updatePasswordUser,
   createResume,
-  deleteResume,
+  // deleteResume,
   getAllResume,
   // getOneResume,
   getApply,
   apply,
 } = require("./controller");
+const { Users } = require("../../models");
 
 // path
 const path = require("path");
@@ -25,17 +26,22 @@ const { v4: uuidv4 } = require("uuid");
 
 // multer
 const multer = require("multer");
-const { create } = require("domain");
 const storage = multer.diskStorage({
   // set the directory to save resume file
-  destination: (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
-    // console.log(dir); 
-    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak */
+  destination: async (req, file, cb) => { 
+    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
+    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
       fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
       return cb(null, dir);
     }
 
+    const resultId = await Users.findOne({
+      where: { id: req.userId.id },
+      attributes: ['resume'],
+    });
+
+    // console.log(resultId.dataValues.resume);
+    fs.unlinkSync(dir + resultId.dataValues.resume);
     cb(null, dir);
   },
   // set filename using uuid (safety)
@@ -58,10 +64,10 @@ route.put("/user-email", auth, updateEmailUser);
 route.put("/user-password", auth, updatePasswordUser);
 route.delete("/user", auth, deleteUser);
 
-route.get("/user/resume", auth, getAllResume);
+route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
 route.post("/user/resume", auth, upload, createResume);
-route.delete("/user/resume/:id", auth, deleteResume);
+// route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/apply", auth, getApply);
 route.post("/user/apply", auth, apply);
