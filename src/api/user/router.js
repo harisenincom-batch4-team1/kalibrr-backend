@@ -33,23 +33,24 @@ const storageResume = multer.diskStorage({
   destination: async (req, file, cb) => { 
     const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
-    // check the directory
-    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
-      fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
-      return cb(null, dir);
-    }
-
-    // if there's a directory
     // get the file name from database
     const resultFileName = await Users.findOne({
       where: { id: req.userId.id },
       attributes: ['resume'],
     });
 
-    // console.log(resultFileName.dataValues.resume);
-
-    fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
-    cb(null, dir);
+    // check the directory
+    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
+      fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
+      return cb(null, dir);
+    }
+    else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */ 
+      return cb(null, dir);
+    }
+    else if (fs.existsSync(dir + resultFileName.dataValues.resume)) {
+      fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
+      cb(null, dir);
+    }
   },
 
   // set filename using uuid (safety)
@@ -85,10 +86,32 @@ const storagePhoto = multer.diskStorage({
   }
 });
 
+// make handler to file size
+const fileSizeHandler = (error, req, res, next) => {
+  if (error) {
+    return res.status(400).send({
+      error: error?.message
+    });
+  }
+
+  next();
+}
+
 const uploadResume = multer({
     storage: storageResume,
     limits: {
       fileSize: 1000000 /* 1 MB */
+    },
+    // filter file
+    fileFilter: (req, file, cb) => {
+      const extFile = path.extname(file.originalname);
+      const extFilter = '.pdf';
+
+      if (extFile !== extFilter) {
+        return cb(new Error("Resume yang diinput harus berbentuk PDF"))
+      }
+
+      cb(null, true);
     }
 }).single("resume");
 
@@ -96,6 +119,16 @@ const uploadPhoto = multer({
   storage: storagePhoto,
   limits: {
     fileSize: 3000000 /* 3 MB */
+  },
+  fileFilter: (req, file, cb) => {
+    const extFile = path.extname(file.originalname);
+    const extFilter = ['.jpg', '.jpeg', '.png'];
+
+    if (!extFilter.includes(extFile)) {
+      return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"))
+    }
+
+    cb(null, true);
   }
 }).single("photo");
 
@@ -109,11 +142,11 @@ route.delete("/user", auth, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
-route.put("/user/resume", auth, uploadResume, createResume);
+route.put("/user/resume", auth, uploadResume, fileSizeHandler, createResume);
 // route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/photo", auth, getAllPhoto);
-route.put("/user/photo", auth, uploadPhoto, putPhoto);
+route.put("/user/photo", auth, uploadPhoto, fileSizeHandler, putPhoto);
 
 route.get("/user/apply", auth, getApply);
 route.post("/user/apply", auth, apply);
