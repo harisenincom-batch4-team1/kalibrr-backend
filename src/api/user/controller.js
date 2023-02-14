@@ -4,8 +4,6 @@ const checkToken = require("../../helpers/checkToken");
 const passwordCompare = require("../../helpers/passwordCompare");
 const passwordHashing = require("../../helpers/passwordHashing");
 
-
-
 const getDetailUser = async (req, res) => {
   const id = checkToken(req);
   try {
@@ -235,7 +233,6 @@ const getAllResume = async (req, res) => {
 const createResume = async (req, res) => {
   const id = checkToken(req);
   const resume = req.file.filename; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
-  console.log(resume);
   try {
     const checkId = await Users.findOne({
       where: {
@@ -296,6 +293,63 @@ const createResume = async (req, res) => {
 //     return res.status(500).send(responseData(500, null, error?.message, null));
 //   }
 // };
+
+const putPhoto = async (req, res) => {
+  const id = checkToken(req);
+  const photo = req.file.filename;
+  try {
+    const checkId = await Users.findOne({
+      where: {
+        id: id
+      }
+    });
+
+    if (!checkId) {
+      return res
+        .status(500)
+        .send(responseData(500, "Akun tidak ditemukan", null, null));
+    }
+
+    if (!photo) {
+      return res
+        .status(500)
+        .send(responseData(500, "Foto Profile belum diinput", null, null));
+    }
+
+    const values = {
+      photo,
+    };
+
+    const selector = {
+      where: {
+        id: id,
+      },
+    };
+
+    const result = await Users.update(values, selector);
+
+    res
+      .status(201)
+      .send(responseData(201, "Foto Profile telah diinput", null, result));
+
+    return result;
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
+
+const getAllPhoto = async (req, res) => {
+  const id = checkToken(req);
+  try {
+    const result = await Users.findOne({
+      where: { id: id },
+      attributes: ['photo'],
+    });
+    return res.status(200).send(responseData(200, "OK", null, result));
+  } catch (error) {
+    return res.status(500).send(responseData(500, null, error?.message, null));
+  }
+};
 
 const getApply = async (req, res) => {
   const id = checkToken(req);
@@ -385,6 +439,8 @@ module.exports = {
   // getOneResume,
   createResume,
   // deleteResume,
+  putPhoto,
+  getAllPhoto,
   apply,
   getApply,
 };
