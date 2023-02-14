@@ -83,7 +83,7 @@ const loginUser = async (req, res) => {
 const registerCompany = async (req, res) => {
   try {
     const { name, email, password, location, photo, phone } = req.body;
-    if (!name && !password && !email && !location && !phone) {
+    if (!name || !password || !email || !location || !phone) {
       return res
         .status(500)
         .send(responseData(500, "Data tidak boleh kosong", null, null));
@@ -118,7 +118,7 @@ const registerCompany = async (req, res) => {
 const loginCompany = async (req, res) => {
   const { email, password } = req.body;
   try {
-    if (!email && !password) {
+    if (!email || !password) {
       return res
         .status(500)
         .send(responseData(500, "Form tidak boleh kosong", null, null));
