@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       phone: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.STRING,
         allowNull: true,
       },
       role: {

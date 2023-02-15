@@ -5,7 +5,7 @@ const config = {
   development: {
     username: "root",
     password: process.env.DEVELOPMENT_MYSQL_PASSWORD,
-    database: process.env.DEVELOPMENT_MYSQL_DATABASE,
+    database: "kalibrr",
     host: process.env.DEVELOPMENT_MYSQL_HOST,
     dialect: "mysql",
     dialectOptions: {

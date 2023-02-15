@@ -1,5 +1,6 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
+const responseData = require("../../helpers/responseData");
 const {
   getDetailUser,
   deleteUser,
@@ -44,13 +45,16 @@ const storageResume = multer.diskStorage({
       fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
       return cb(null, dir);
     }
-    else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */ 
-      return cb(null, dir);
-    }
-    else if (fs.existsSync(dir + resultFileName.dataValues.resume)) {
-      fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
-      cb(null, dir);
-    }
+    // else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */ 
+    //   return cb(null, dir);
+    // }
+    // else if (fs.existsSync(dir + resultFileName.dataValues.resume)) {
+    //   fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
+    //   cb(null, dir);
+    // }
+
+    fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
+    cb(null, dir);
   },
 
   // set filename using uuid (safety)
@@ -89,9 +93,7 @@ const storagePhoto = multer.diskStorage({
 // make handler to file size
 const fileSizeHandler = (error, req, res, next) => {
   if (error) {
-    return res.status(400).send({
-      error: error?.message
-    });
+    return res.status(400).send(responseData(400, null, error?.message, null));
   }
 
   next();

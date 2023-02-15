@@ -264,11 +264,9 @@ const createResume = async (req, res) => {
 
     const result = await Users.update(values, selector);
 
-    res
+    return res
       .status(201)
       .send(responseData(201, "CV telah diinput", null, result));
-
-    return result;
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }

@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "https://cdn-icons-png.flaticon.com/512/2098/2098316.png"
       },
       phone: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       createdAt: {
