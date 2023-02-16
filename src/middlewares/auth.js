@@ -21,7 +21,7 @@ const auth = (req, res, next) => {
     const decodeToken = jwt.decode(token);
     // console.log(decodeToken);
     
-    req.userId = decodeToken;
+    req.globId = decodeToken;
 
     next();
   } catch (error) {

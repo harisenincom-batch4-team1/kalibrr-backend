@@ -1,6 +1,6 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
-const responseData = require("../../helpers/responseData");
+// const responseData = require("../../helpers/responseData");
 const {
   getDetailUser,
   deleteUser,
@@ -16,133 +16,147 @@ const {
   getApply,
   apply,
 } = require("./controller");
-const { Users } = require("../../models");
+const {
+  uploadResumeUser,
+  uploadPhotoUser,
+  fileSizeResumeUserHandler,
+  // removeFileResumeUser,
+  // removePhotoUser
+} = require("../../helpers/uploadFile");
 
-// path
-const path = require("path");
+// const { Users } = require("../../models");
 
-// fs
-const fs = require("fs")
+// // path
+// const path = require("path");
 
-// uuid
-const { v4: uuidv4 } = require("uuid");
+// // fs
+// const fs = require("fs")
 
-// get the file name from database
-const resultFileName = async(id) => {
-  return await Users.findOne({
-    where: { id },
-    attributes: ['resume', 'photo'],
-  });
-}
+// // uuid
+// const { v4: uuidv4 } = require("uuid");
 
-// multer
-const multer = require("multer");
-const storageResume = multer.diskStorage({
-  // set the directory to save resume file
-  destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
+// // get the file name from database
+// const resultFileName = async(id) => {
+//   return await Users.findOne({
+//     where: { id },
+//     attributes: ['resume', 'photo'],
+//   });
+// }
 
-    req.dir = dir;
+// // multer
+// const multer = require("multer");
+// const storageResume = multer.diskStorage({
+//   // set the directory to save resume file
+//   destination: async (req, file, cb) => { 
+//     const dir = path.join(__dirname, "../../../public/uploads/users/" + req.globId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
-    // check the directory
-    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
-      fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
-      return cb(null, dir);
-    }
-    // else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */ 
-    //   return cb(null, dir);
-    // }
-    // else if (fs.existsSync(dir + resultFileName.dataValues.resume)) {
-    //   fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
-    //   cb(null, dir);
-    // }
+//     req.dir = dir;
 
-    cb(null, dir);
-  },
+//     // check the directory
+//     if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
+//       fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
+//       return cb(null, dir);
+//     }
+//     // else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */ 
+//     //   return cb(null, dir);
+//     // }
+//     // else if (fs.existsSync(dir + resultFileName.dataValues.resume)) {
+//     //   fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
+//     //   cb(null, dir);
+//     // }
 
-  // set filename using uuid (safety)
-  filename: (req, file, cb) => {
-    // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
-    cb(null, fileName + path.extname(file.originalname));
-  }
-});
+//     cb(null, dir);
+//   },
 
-const storagePhoto = multer.diskStorage({
-  destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/photo/");
+//   // set filename using uuid (safety)
+//   filename: (req, file, cb) => {
+//     // console.log(file);
+//     const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+//     cb(null, fileName + path.extname(file.originalname));
+//   }
+// });
 
-    req.dir = dir;
+// const storagePhoto = multer.diskStorage({
+//   destination: async (req, file, cb) => { 
+//     const dir = path.join(__dirname, "../../../public/uploads/users/" + req.globId.id + "/photo/");
 
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      return cb(null, dir);
-    }
+//     req.dir = dir;
 
-    // console.log(resultFileName.dataValues.photo);
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
-    cb(null, fileName + path.extname(file.originalname));
-  }
-});
+//     if (!fs.existsSync(dir)) {
+//       fs.mkdirSync(dir, { recursive: true });
+//       return cb(null, dir);
+//     }
 
-const fileSizeResumeHandler = (error, req, res, next) => {
-  if (error) {
-    return res.status(400).send(responseData(400, null, error?.message, null));
-  }
+//     // console.log(resultFileName.dataValues.photo);
+//     cb(null, dir);
+//   },
+//   filename: (req, file, cb) => {
+//     // console.log(file);
+//     const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+//     cb(null, fileName + path.extname(file.originalname));
+//   }
+// });
 
-  next();
-  fs.unlinkSync(dir + resultFileName.dataValues.resume);
-}
+// const fileSizeResumeHandler = async (req, res, next) => {
+//   // if (error) {
+//   //   return res.status(400).send(responseData(400, null, error?.message, null));
+//   // }
+//   // else {
+//     const resultFile = await resultFileName(req.globId.id);
+//     console.log('hasil :',resultFile);
+//     console.log('hasil dir :',req.dir);
 
-const fileSizePhotoHandler = (error, req, res, next) => {
-  if (error) {
-    return res.status(400).send(responseData(400, null, error?.message, null));
-  }
+//     fs.unlinkSync(req.dir + resultFile.dataValues.resume);
+//     next();
+//   // }
+// }
 
-  next();
-  fs.unlinkSync(dir + resultFileName.dataValues.photo);
-}
+// const fileSizePhotoHandler = (error, req, res, next) => {
+//   if (error) {
+//     return res.status(400).send(responseData(400, null, error?.message, null));
+//   }
 
-const uploadResume = multer({
-    storage: storageResume,
-    limits: {
-      fileSize: 1000000 /* 1 MB */
-    },
-    // filter file
-    fileFilter: (req, file, cb) => {
-      const extFile = path.extname(file.originalname);
-      const extFilter = '.pdf';
+//   const resultFile = resultFileName(req.globId.id);
+//   fs.unlinkSync(dir + resultFile.dataValues.photo);
+//   next();
+// }
 
-      if (extFile !== extFilter) {
-        return cb(new Error("Resume yang diinput harus berbentuk PDF"));
-      }
+// const uploadResume = multer({
+//     storage: storageResume,
+//     limits: {
+//       fileSize: 1000000 /* 1 MB */
+//     },
+//     // filter file
+//     fileFilter: (req, file, cb) => {
+//       const extFile = path.extname(file.originalname);
+//       const extFilter = '.pdf';
 
-      req.uploadType = "resume";
-      cb(null, true);
-    }
-}).single("resume");
+//       if (extFile !== extFilter) {
+//         return cb(new Error("Resume yang diinput harus berbentuk PDF"));
+//       }
 
-const uploadPhoto = multer({
-  storage: storagePhoto,
-  limits: {
-    fileSize: 3000000 /* 3 MB */
-  },
-  fileFilter: (req, file, cb) => {
-    const extFile = path.extname(file.originalname);
-    const extFilter = ['.jpg', '.jpeg', '.png'];
+//       req.uploadType = "resume";
+//       cb(null, true);
+//     }
+// }).single("resume");
 
-    if (!extFilter.includes(extFile)) {
-      return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"))
-    }
+// const uploadPhoto = multer({
+//   storage: storagePhoto,
+//   limits: {
+//     fileSize: 3000000 /* 3 MB */
+//   },
+//   fileFilter: (req, file, cb) => {
+//     const extFile = path.extname(file.originalname);
+//     const extFilter = ['.jpg', '.jpeg', '.png'];
 
-    req.uploadType = "photo";
-    cb(null, true);
-  }
-}).single("photo");
+//     if (!extFilter.includes(extFile)) {
+//       return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"))
+//     }
+
+//     req.uploadType = "photo";
+//     cb(null, true);
+//   }
+// }).single("photo");
 
 const route = express();
 
@@ -154,11 +168,11 @@ route.delete("/user", auth, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
-route.put("/user/resume", auth, uploadResume, fileSizeResumeHandler, createResume);
+route.put("/user/resume", auth, uploadResumeUser, fileSizeResumeUserHandler, createResume);
 // route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/photo", auth, getAllPhoto);
-route.put("/user/photo", auth, uploadPhoto, fileSizeResumeHandler, putPhoto);
+route.put("/user/photo", auth, uploadPhotoUser, putPhoto);
 
 route.get("/user/apply", auth, getApply);
 route.post("/user/apply", auth, apply);
