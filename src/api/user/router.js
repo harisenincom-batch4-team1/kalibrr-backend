@@ -27,6 +27,14 @@ const fs = require("fs")
 // uuid
 const { v4: uuidv4 } = require("uuid");
 
+// get the file name from database
+const resultFileName = async(id) => {
+  return await Users.findOne({
+    where: { id },
+    attributes: ['resume', 'photo'],
+  });
+}
+
 // multer
 const multer = require("multer");
 const storageResume = multer.diskStorage({
@@ -34,11 +42,7 @@ const storageResume = multer.diskStorage({
   destination: async (req, file, cb) => { 
     const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
-    // get the file name from database
-    const resultFileName = await Users.findOne({
-      where: { id: req.userId.id },
-      attributes: ['resume'],
-    });
+    req.dir = dir;
 
     // check the directory
     if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
@@ -53,7 +57,6 @@ const storageResume = multer.diskStorage({
     //   cb(null, dir);
     // }
 
-    fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
     cb(null, dir);
   },
 
@@ -69,18 +72,14 @@ const storagePhoto = multer.diskStorage({
   destination: async (req, file, cb) => { 
     const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/photo/");
 
+    req.dir = dir;
+
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
       return cb(null, dir);
     }
 
-    const resultFileName = await Users.findOne({
-      where: { id: req.userId.id },
-      attributes: ['photo'],
-    });
-
     // console.log(resultFileName.dataValues.photo);
-    fs.unlinkSync(dir + resultFileName.dataValues.photo);
     cb(null, dir);
   },
   filename: (req, file, cb) => {
@@ -90,13 +89,22 @@ const storagePhoto = multer.diskStorage({
   }
 });
 
-// make handler to file size
-const fileSizeHandler = (error, req, res, next) => {
+const fileSizeResumeHandler = (error, req, res, next) => {
   if (error) {
     return res.status(400).send(responseData(400, null, error?.message, null));
   }
 
   next();
+  fs.unlinkSync(dir + resultFileName.dataValues.resume);
+}
+
+const fileSizePhotoHandler = (error, req, res, next) => {
+  if (error) {
+    return res.status(400).send(responseData(400, null, error?.message, null));
+  }
+
+  next();
+  fs.unlinkSync(dir + resultFileName.dataValues.photo);
 }
 
 const uploadResume = multer({
@@ -110,9 +118,10 @@ const uploadResume = multer({
       const extFilter = '.pdf';
 
       if (extFile !== extFilter) {
-        return cb(new Error("Resume yang diinput harus berbentuk PDF"))
+        return cb(new Error("Resume yang diinput harus berbentuk PDF"));
       }
 
+      req.uploadType = "resume";
       cb(null, true);
     }
 }).single("resume");
@@ -130,6 +139,7 @@ const uploadPhoto = multer({
       return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"))
     }
 
+    req.uploadType = "photo";
     cb(null, true);
   }
 }).single("photo");
@@ -144,11 +154,11 @@ route.delete("/user", auth, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
-route.put("/user/resume", auth, uploadResume, fileSizeHandler, createResume);
+route.put("/user/resume", auth, uploadResume, fileSizeResumeHandler, createResume);
 // route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/photo", auth, getAllPhoto);
-route.put("/user/photo", auth, uploadPhoto, fileSizeHandler, putPhoto);
+route.put("/user/photo", auth, uploadPhoto, fileSizeResumeHandler, putPhoto);
 
 route.get("/user/apply", auth, getApply);
 route.post("/user/apply", auth, apply);

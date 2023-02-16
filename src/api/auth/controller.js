@@ -82,8 +82,9 @@ const loginUser = async (req, res) => {
 
 const registerCompany = async (req, res) => {
   try {
-    const { name, email, password, location, photo, phone } = req.body;
-    if (!name || !password || !email || !location || !phone) {
+    const { name, email, password, location, phone } = req.body;
+    const photo = req.file.filename;
+    if (!name || !password || !email || !location || !phone || !photo) {
       return res
         .status(500)
         .send(responseData(500, "Data tidak boleh kosong", null, null));
@@ -105,7 +106,8 @@ const registerCompany = async (req, res) => {
       email,
       password: passwordHash,
       location,
-      phone
+      phone,
+      photo
     });
     return res
       .status(201)
