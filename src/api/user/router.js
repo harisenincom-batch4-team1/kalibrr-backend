@@ -20,7 +20,7 @@ const {
   uploadResumeUser,
   uploadPhotoUser,
   fileSizeResumeUserHandler,
-  // removeFileResumeUser,
+  removeFileResumeUser,
   // removePhotoUser
 } = require("../../helpers/uploadFile");
 
@@ -168,7 +168,8 @@ route.delete("/user", auth, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
-route.put("/user/resume", auth, uploadResumeUser, fileSizeResumeUserHandler, createResume);
+  removeFileResumeUser,
+route.put("/user/resume", auth, uploadResumeUser, fileSizeResumeUserHandler,removeFileResumeUser, createResume);
 // route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/photo", auth, getAllPhoto);

@@ -25,7 +25,7 @@ const resultFileNameUser = async (id) => {
 const storageResumeUser = multer.diskStorage({
   // set the directory to save resume file
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.globId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
+    const dir = path.join(__dirname, "../../public/uploads/users/" + req.globId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
     req.dir = dir;
 
@@ -49,7 +49,7 @@ const storageResumeUser = multer.diskStorage({
 // storage photo profile user
 const storagePhotoUser = multer.diskStorage({
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.globId.id + "/photo/");
+    const dir = path.join(__dirname, "../../public/uploads/users/" + req.globId.id + "/photo/");
 
     req.dir = dir;
 
@@ -114,31 +114,30 @@ const fileSizeResumeUserHandler = async(error, req, res, next) => {
   }
 
   next();
-  
-  const resultFile = await resultFileNameUser(req.globId.id);
-  const resultDir = req.dir;
-  console.log('hasil :',resultFile);
-  console.log('hasil dir :',req.dir);
-
-  fs.unlinkSync(resultDir + resultFile.dataValues.resume);
 }
 
-// // remove previous resume user
-// const removeFileResumeUser = async(req) => {
-//   const resultFile = await resultFileNameUser(req.globId.id);
-//   const fileDir = req.dir;
-//   console.log('hasil req :',resultFile);
-//   console.log('hasil dir :',fileDir + resultFile.dataValues.resume);
+// remove previous resume user
+const removeFileResumeUser = async(req, res, next) => {
+  try {
+    const resultFile = await resultFileNameUser(req.globId.id);
+    const resultDir = req.dir;
+    console.log('hasil :',resultFile);
+    console.log('hasil dir :',req.dir);
+    if (fs.existsSync(resultDir + resultFile.dataValues.resume)) {
+      fs.unlinkSync(resultDir + resultFile.dataValues.resume);
+    }
 
-//   if(!fs.existsSync(fileDir + resultFile.dataValues.resume)) {
-//     return false;
-//   }
-//   return fs.unlinkSync(fileDir + resultFile.dataValues.resume);
+    next();
+  }
+  catch (error) {
+    console.log(error);
+    return next(error);
+  }
 
-//   // if (fs.existsSync(fileDir + (fileType ? resultFile.dataValues.resume : resultFile.dataValues.photo))) {
-//   //   fs.unlinkSync(fileDir + (fileType ? resultFile.dataValues.resume : resultFile.dataValues.photo));
-//   // }
-// }
+  // if (fs.existsSync(fileDir + (fileType ? resultFile.dataValues.resume : resultFile.dataValues.photo))) {
+  //   fs.unlinkSync(fileDir + (fileType ? resultFile.dataValues.resume : resultFile.dataValues.photo));
+  // }
+}
 
 // // remove previous photo profile user
 // const removePhotoUser = async(req) => {
@@ -153,6 +152,6 @@ module.exports = {
   uploadResumeUser,
   uploadPhotoUser,
   fileSizeResumeUserHandler,
-  // removeFileResumeUser,
+  removeFileResumeUser,
   // removePhotoUser
 }

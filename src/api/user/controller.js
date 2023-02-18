@@ -231,6 +231,7 @@ const getAllResume = async (req, res) => {
 // };
 
 const createResume = async (req, res) => {
+  console.log("Create Resume Terpanggil");
   const id = checkToken(req);
   const resume = req.file.filename; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
   try {
