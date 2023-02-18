@@ -18,10 +18,10 @@ const auth = (req, res, next) => {
       return res.status(401).send(responseData(401, "Unauthorized", null, null));
     }
 
-    const decodeToken = jwt.decode(token);
+    // const decodeToken = jwt.decode(token);
     // console.log(decodeToken);
     
-    req.userId = decodeToken;
+    // req.userId = decodeToken;
 
     next();
   } catch (error) {

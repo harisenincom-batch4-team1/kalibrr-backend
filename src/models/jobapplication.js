@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       models.JobApplications.belongsTo(models.Users, {
-        foreignKey: "userId",
+        foreignKey: "id",
       });
       models.JobApplications.belongsTo(models.Jobs, {
         foreignKey: "jobId",
@@ -25,10 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      applicantId: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "Applicants", key: "id" },
+        references: { model: "Users", key: "id" },
       },
       jobId: {
         type: DataTypes.INTEGER,

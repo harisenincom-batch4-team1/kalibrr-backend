@@ -2,6 +2,7 @@ const { Jobs, Companies, JobApplications } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordHashing = require("../../helpers/passwordHashing");
+const passwordCompare = require("../../helpers/passwordCompare");
 
 const getDetailCompany = async (req, res) => {
   try {
@@ -223,6 +224,7 @@ const getAllJob = async (req, res) => {
   try {
     const result = await Jobs.findAll({
       where: { companyId: id },
+      order: [["id", "DESC"]],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
@@ -407,7 +409,9 @@ const updateApplyStatus = async (req, res) => {
     };
     await JobApplications.update(values, selector);
 
-    return res.status(201).send(responseData(200, "Berhasil update status pelamar", null, null))
+    return res
+      .status(201)
+      .send(responseData(200, "Berhasil update status pelamar", null, null));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
