@@ -1,6 +1,6 @@
 ## ERD
 
-![erd](./public/erd.webp)
+![image](https://user-images.githubusercontent.com/114470554/219956074-806bb053-38dd-4f8c-ac18-b80942325c6b.png)
 
 ## SPEC API
 
