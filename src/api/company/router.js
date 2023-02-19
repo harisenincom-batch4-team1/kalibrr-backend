@@ -1,5 +1,6 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
+const responseData = require("../../helpers/responseData");
 const {
   getDetailCompany,
   deleteCompany,
@@ -14,6 +15,10 @@ const {
   getUserApply,
   updateApplyStatus
 } = require("./controller");
+const {
+  uploadPhotoCompany,
+  removeFilePhotoCompany
+} = require("../../helpers/uploadFile");
 
 const route = express();
 
