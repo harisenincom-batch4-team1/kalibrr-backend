@@ -6,27 +6,17 @@ const passwordCompare = require("../../helpers/passwordCompare");
 
 const getDetailCompany = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = checkToken(req);
 
-    const checkCompany = await Companies.findOne({
+    const result = await Companies.findOne({
       where: { id },
     });
 
-    if (!checkCompany) {
+    if (!result) {
       return res
         .status(404)
         .send(responseData(404, "Perusahaan tidak ditemukan", null, null));
     }
-
-    const result = await Companies.findAll({
-      where: { id },
-      include: [
-        {
-          model: Jobs,
-          attributes: { exclude: ["password"] },
-        },
-      ],
-    });
 
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
