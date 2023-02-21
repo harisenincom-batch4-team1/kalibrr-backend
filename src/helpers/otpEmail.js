@@ -12,20 +12,19 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendMail = (email, generateOTP) => {
+const sendMail = async (email, otp) => {
   const options = {
     from: "'Kalibrr' <no-reply@gmail.com>",
     to: email,
     subject: "KALIBRR",
-    text: generateOTP(),
+    html: ``,
+    text: otp,
   };
 
   transporter.sendMail(options, (err, info) => {
     if (err) return "Gagal, mohon ulangi lagi";
     return "OTP sudah dikirim";
   });
-
-  return generateOTP();
 };
 
 module.exports = sendMail;

@@ -193,6 +193,8 @@ const sendOtpCompany = async (req, res, next) => {
       return OTP;
     }
 
+    const OTP = generateOTP();
+
     if (checkEmailOtp) {
       const values = {
         otp: generateOTP(),
@@ -206,10 +208,10 @@ const sendOtpCompany = async (req, res, next) => {
       return res.status(201).send(responseData(200, null, null, ""));
     }
 
-    const result = otpEmail(email, generateOTP);
+    await otpEmail(email, OTP);
 
     await TempEmailCompanies.create({
-      otp: result,
+      otp: OTP,
       email: email,
     });
 
