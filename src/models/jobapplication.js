@@ -25,10 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      applicantId: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "Applicants", key: "id" },
+        references: { model: "Users", key: "id" },
       },
       jobId: {
         type: DataTypes.INTEGER,

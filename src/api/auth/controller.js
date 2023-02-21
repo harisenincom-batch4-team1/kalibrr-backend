@@ -84,7 +84,7 @@ const registerCompany = async (req, res) => {
   try {
     const { name, email, password, location, phone } = req.body;
     const photo = req.file.filename;
-    if (!name || !password || !email || !location || !phone || !photo) {
+    if (!name, !password, !email, !location, !phone, !photo) {
       return res
         .status(500)
         .send(responseData(500, "Data tidak boleh kosong", null, null));

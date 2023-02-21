@@ -36,7 +36,6 @@ route.delete("/user", auth, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
-  removeFileResumeUser,
 route.put("/user/resume", auth, (req, res, next) => {
   uploadResumeUser(req, res, (error) => {
     if (error) {
