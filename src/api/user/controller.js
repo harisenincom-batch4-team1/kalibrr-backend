@@ -354,10 +354,11 @@ const getApply = async (req, res) => {
   try {
     const checkResume = await JobApplications.findOne({ where: { userId: id } });
     if (!checkResume) {
-      return res.status(200).send(responseData(200, "OK", null, []));
+      return res.status(500).send(responseData(500, "Kamu belum melamar dimanapun", null, []));
     }
     const result = await JobApplications.findAll({
-      where: { applicantId: checkResume.userId },
+      where: { userId: checkResume.userId },
+      include: [Jobs],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
