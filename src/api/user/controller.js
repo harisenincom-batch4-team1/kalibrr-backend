@@ -1,4 +1,4 @@
-const { Users, JobApplications, Jobs } = require("../../models");
+const { Users, JobApplications, Jobs, Companies } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordCompare = require("../../helpers/passwordCompare");
@@ -358,7 +358,14 @@ const getApply = async (req, res) => {
     }
     const result = await JobApplications.findAll({
       where: { userId: checkResume.userId },
-      include: [Jobs],
+      include: [{
+        model: Jobs,
+        required: true,
+        include: [{
+          model: Companies,
+          required: true
+        }]
+      }]
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {

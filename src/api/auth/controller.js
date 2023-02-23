@@ -109,6 +109,7 @@ const registerCompany = async (req, res) => {
       phone,
       photo
     });
+
     return res
       .status(201)
       .send(responseData(201, "Register Berhasil", null, null));
