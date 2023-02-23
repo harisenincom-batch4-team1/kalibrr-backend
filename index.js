@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const port = process.env.APP_PORT || 9000;

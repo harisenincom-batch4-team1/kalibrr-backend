@@ -3,6 +3,7 @@ const responseData = require("../../helpers/responseData");
 const passwordHashing = require("../../helpers/passwordHashing");
 const passwordCompare = require("../../helpers/passwordCompare");
 const generateToken = require("../../helpers/generateToken");
+const generateOTP = require("../../helpers/generateOtp");
 const otpEmail = require("../../helpers/otpEmail");
 
 const registerUser = async (req, res) => {
@@ -108,9 +109,22 @@ const registerCompany = async (req, res) => {
       location,
       phone,
     });
+
+    const companyData = await Companies.findOne({
+      where: { email },
+    });
+
+    const data = {
+      id: companyData.id,
+      name: companyData.name,
+      email: companyData.email,
+    };
+
+    const token = generateToken(data);
+
     return res
-      .status(201)
-      .send(responseData(201, "Register Berhasil", null, null));
+      .status(200)
+      .send(responseData(200, "Register berhasil", null, token));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
@@ -184,16 +198,7 @@ const sendOtpCompany = async (req, res, next) => {
       where: { email },
     });
 
-    function generateOTP() {
-      let digits = "0123456789";
-      let OTP = "";
-      for (let i = 0; i < 4; i++) {
-        OTP += digits[Math.floor(Math.random() * 10)];
-      }
-      return OTP;
-    }
-
-    const OTP = generateOTP();
+    const OTP = await generateOTP();
 
     if (checkEmailOtp) {
       const values = {
