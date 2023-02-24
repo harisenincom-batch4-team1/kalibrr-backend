@@ -1,6 +1,6 @@
 ## ERD
 
-![image](https://user-images.githubusercontent.com/114470554/219956074-806bb053-38dd-4f8c-ac18-b80942325c6b.png)
+![drawSQL-kalibrr-export-2023-02-23](https://user-images.githubusercontent.com/65301817/221172548-420a990b-d38a-4f47-92ec-095be868065a.png)
 
 ## SPEC API
 
