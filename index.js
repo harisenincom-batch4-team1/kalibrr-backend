@@ -9,7 +9,6 @@ const googleDrive = require("./googleDrive");
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(googleDrive);
 
 const v1 = "/api/v1";
 const publicRoute = require("./src/api/public/router");
