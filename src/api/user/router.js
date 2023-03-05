@@ -17,12 +17,9 @@ const {
   apply,
 } = require("./controller");
 const {
-  // uploadResumeUserHandler,
   uploadResumeUser,
   uploadPhotoUser,
-  // fileSizeResumeUserHandler,
   removeFileResumeUser,
-  // fileSizePhotoUserHandler,
   removeFilePhotoUser
 } = require("../../helpers/uploadFile");
 
@@ -48,7 +45,14 @@ route.put("/user/resume", auth, (req, res, next) => {
 // route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/photo", auth, getAllPhoto);
-route.put("/user/photo", auth, uploadPhotoUser, removeFilePhotoUser, putPhoto);
+route.put("/user/photo", auth, (req, res, next) => {
+  uploadPhotoUser(req, res, (error) => {
+    if (error) {
+      return res.status(400).send(responseData(400, null, error?.message, null));
+    }
+    next();
+  })
+}, removeFilePhotoUser, putPhoto);
 
 route.get("/user/apply", auth, getApply);
 route.post("/user/apply", auth, apply);

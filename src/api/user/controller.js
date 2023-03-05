@@ -363,7 +363,10 @@ const getApply = async (req, res) => {
         required: true,
         include: [{
           model: Companies,
-          required: true
+          required: true,
+          attributes: {
+            exclude: ['password']
+          } 
         }]
       }]
     });

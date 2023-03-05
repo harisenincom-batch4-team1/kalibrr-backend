@@ -12,7 +12,6 @@ route.post("/auth/company/register", (req, res, next) => {
         if (error) {
             return res.status(400).send(responseData(400, null, error?.message, null));
         }
-
         next();
     });
 }, registerCompany);

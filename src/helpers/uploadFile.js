@@ -127,8 +127,8 @@ const uploadPhotoUser = multer({
 const removeFileResumeUser = async(req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
   const resultDir = req.dir;
-  console.log('hasil :',resultFile);
-  console.log('hasil dir :',req.dir);
+  // console.log('hasil :',resultFile);
+  // console.log('hasil dir :',req.dir);
   if (fs.existsSync(resultDir + resultFile.dataValues.resume)) {
     fs.unlinkSync(resultDir + resultFile.dataValues.resume);
   }
@@ -149,8 +149,8 @@ const removeFileResumeUser = async(req, res, next) => {
 const removeFilePhotoUser = async(req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
   const resultDir = req.dir;
-  console.log('hasil :',resultFile);
-  console.log('hasil dir :',req.dir);
+  // console.log('hasil :',resultFile);
+  // console.log('hasil dir :',req.dir);
   if (fs.existsSync(resultDir + resultFile.dataValues.photo)) {
     fs.unlinkSync(resultDir + resultFile.dataValues.photo);
   }
@@ -161,7 +161,7 @@ const removeFilePhotoUser = async(req, res, next) => {
 // storage photo profile company
 const storagePhotoCompany = multer.diskStorage({
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../public/uploads/companys/" + req.body.name + "/photo/");
+    const dir = path.join(__dirname, "../../public/uploads/companys/" + req.globId.name + "/photo/");
 
     req.dir = dir;
 

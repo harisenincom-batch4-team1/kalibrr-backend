@@ -3,6 +3,7 @@ const responseData = require("../../helpers/responseData");
 const passwordHashing = require("../../helpers/passwordHashing");
 const passwordCompare = require("../../helpers/passwordCompare");
 const generateToken = require("../../helpers/generateToken");
+// const checkToken = require("../../helpers/checkToken");
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -101,18 +102,33 @@ const registerCompany = async (req, res) => {
     }
 
     const passwordHash = await passwordHashing(password);
-    await Companies.create({
+    const createCompany = await Companies.create({
       name,
       email,
       password: passwordHash,
       location,
-      phone,
-      photo
+      phone
     });
 
-    return res
-      .status(201)
-      .send(responseData(201, "Register Berhasil", null, null));
+    const id = createCompany.dataValues.id;
+
+    const values = {
+      photo: photo
+    };
+
+    const selector = {
+      where: {
+        id: id,
+      }
+    }
+
+    await Companies.update(values, selector);
+
+    req.globId = id;
+
+    // return res
+    //   .status(201)
+    //   .send(responseData(201, "Register Berhasil", null, null));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
