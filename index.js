@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-// require("./googleDrive");
 
 const port = process.env.APP_PORT || 9000;
 

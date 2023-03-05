@@ -84,8 +84,8 @@ const loginUser = async (req, res) => {
 const registerCompany = async (req, res) => {
   try {
     const { name, email, password, location, phone } = req.body;
-    const photo = req.file.filename;
-    if (!name, !password, !email, !location, !phone, !photo) {
+    // const photo = req.file.filename;
+    if (!name, !password, !email, !location, !phone) {
       return res
         .status(500)
         .send(responseData(500, "Data tidak boleh kosong", null, null));
@@ -102,7 +102,7 @@ const registerCompany = async (req, res) => {
     }
 
     const passwordHash = await passwordHashing(password);
-    const createCompany = await Companies.create({
+    await Companies.create({
       name,
       email,
       password: passwordHash,
@@ -110,25 +110,9 @@ const registerCompany = async (req, res) => {
       phone
     });
 
-    const id = createCompany.dataValues.id;
-
-    const values = {
-      photo: photo
-    };
-
-    const selector = {
-      where: {
-        id: id,
-      }
-    }
-
-    await Companies.update(values, selector);
-
-    req.globId = id;
-
-    // return res
-    //   .status(201)
-    //   .send(responseData(201, "Register Berhasil", null, null));
+    return res
+      .status(201)
+      .send(responseData(201, "Register Berhasil", null, null));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
