@@ -1,9 +1,9 @@
-const { Users } = require("../models");
+const { Users, Companies } = require("../models");
 const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
-// const responseData = require("../helpers/responseData");
+const responseData = require("../helpers/responseData");
 
 // get the file name from database
 const resultFileNameUser = async (id) => {
@@ -13,12 +13,12 @@ const resultFileNameUser = async (id) => {
   });
 }
 
-// const resultFileNameCompany = async (name) => {
-//   return await Companies.findOne({
-//     where: { name },
-//     attributes: ['photo'],
-//   });
-// }
+const resultFileNameCompany = async (id) => {
+  return await Companies.findOne({
+    where: { id },
+    attributes: ['photo'],
+  });
+}
 
 // storage resume user
 const storageResumeUser = multer.diskStorage({
@@ -82,7 +82,6 @@ const uploadResumeUser = multer({
       return cb(new Error("Resume yang diinput harus berbentuk PDF"));
     }
 
-    req.uploadType = "resume";
     cb(null, true);
   }
 }).single("resume");
@@ -101,27 +100,29 @@ const uploadPhotoUser = multer({
       return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"));
     }
 
-    req.uploadType = "photo";
     cb(null, true);
   }
 }).single("photo");
 
-// const uploadResumeUserHandler = uploadResumeUser(req, res, (error) => {
-//   if (error instanceof multer.MulterError) {
-//     return res.status(400).send(responseData(400, null, error?.message, null));
-//   }
-
-//   next();
-// });
-
-// // file size user handler
-// const fileSizeResumeUserHandler = async(error, req, res, next) => {
-//   if (error) {
-//     return res.status(400).send(responseData(400, null, error?.message, null));
-//   }
-
-//   next();
-// }
+// upload user handler
+const userUploadHandler = (req, res, next) => {
+  if (req.route.path == '/user/resume') {
+    uploadResumeUser(req, res, (error) => {
+      if (error) {
+        return res.status(400).send(responseData(400, null, error?.message, null));
+      }
+      next();
+    });
+  }
+  else if (req.route.path == '/user/photo') {
+    uploadPhotoUser(req, res, (error) => {
+      if (error) {
+        return res.status(400).send(responseData(400, null, error?.message, null));
+      }
+      next();
+    });
+  }
+}
 
 // remove previous resume user
 const removeFileResumeUser = async(req, res, next) => {
@@ -135,15 +136,6 @@ const removeFileResumeUser = async(req, res, next) => {
 
   next();
 }
-
-// // file size user handler
-// const fileSizePhotoUserHandler = async(error, req, res, next) => {
-//   if (error) {
-//     return res.status(400).send(responseData(400, null, error?.message, null));
-//   }
-
-//   next();
-// }
 
 // remove previous resume user
 const removeFilePhotoUser = async(req, res, next) => {
@@ -161,7 +153,7 @@ const removeFilePhotoUser = async(req, res, next) => {
 // storage photo profile company
 const storagePhotoCompany = multer.diskStorage({
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../public/uploads/companys/" + req.globId.name + "/photo/");
+    const dir = path.join(__dirname, "../../public/uploads/companys/" + req.globId.id + "/photo/");
 
     req.dir = dir;
 
@@ -194,31 +186,36 @@ const uploadPhotoCompany = multer({
       return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"));
     }
 
-    req.uploadType = "photo";
     cb(null, true);
   }
 }).single("photo");
 
-// const removeFilePhotoCompany = async(req, res, next) => {
-//   const resultFile = req.body.name;
-//   const resultDir = req.dir;
-//   console.log('hasil: ' + resultFile);
-//   console.log('hasil dir :' + req.dir);
-//   if (fs.existsSync(resultDir + resultFile.dataValues.photo)) {
-//     fs.unlinkSync(resultDir + resultFile.dataValues.photo);
-//   }
+// upload company handler
+const companyUploadHandler = (req, res, next) => {
+  uploadPhotoCompany(req, res, (error) => {
+    if (error) {
+      return res.status(400).send(responseData(400, null, error?.message, null));
+    }
+    next();
+  });
+}
 
-//   next();
-// }
+const removeFilePhotoCompany = async(req, res, next) => {
+  const resultFile = await resultFileNameCompany(req.globId.id);
+  const resultDir = req.dir;
+  // console.log('hasil: ' + resultFile);
+  // console.log('hasil dir :' + req.dir);
+  if (fs.existsSync(resultDir + resultFile.dataValues.photo)) {
+    fs.unlinkSync(resultDir + resultFile.dataValues.photo);
+  }
+
+  next();
+}
 
 module.exports = {
-  uploadResumeUser,
-  uploadPhotoUser,
-  uploadPhotoCompany,
-  // fileSizeResumeUserHandler,
-  // uploadResumeUserHandler,
+  userUploadHandler,
+  companyUploadHandler,
   removeFileResumeUser,
-  // fileSizePhotoUserHandler,
   removeFilePhotoUser,
-  // removeFilePhotoCompany
+  removeFilePhotoCompany
 }
