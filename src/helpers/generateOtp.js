@@ -7,4 +7,4 @@ async function generateOTP() {
   return OTP;
 }
 
-module.exports = generateOTP
+module.exports = generateOTP;

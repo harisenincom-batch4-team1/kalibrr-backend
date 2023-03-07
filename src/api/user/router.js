@@ -22,7 +22,7 @@ const { Users } = require("../../models");
 const path = require("path");
 
 // fs
-const fs = require("fs")
+const fs = require("fs");
 
 // uuid
 const { v4: uuidv4 } = require("uuid");
@@ -31,21 +31,25 @@ const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
 const storageResume = multer.diskStorage({
   // set the directory to save resume file
-  destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
+  destination: async (req, file, cb) => {
+    const dir = path.join(
+      __dirname,
+      "../../../public/uploads/users/" + req.userId.id + "/resume/"
+    ); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
     // get the file name from database
     const resultFileName = await Users.findOne({
       where: { id: req.userId.id },
-      attributes: ['resume'],
+      attributes: ["resume"],
     });
 
     // check the directory
-    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
+    if (!fs.existsSync(dir)) {
+      /* mengecek directorynya ada atau tidak (boolean) */
       fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
       return cb(null, dir);
     }
-    // else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */ 
+    // else if (!fs.existsSync(dir + resultFileName.dataValues.resume)) { /* cek apakah file masih ada atau tidak */
     //   return cb(null, dir);
     // }
     // else if (fs.existsSync(dir + resultFileName.dataValues.resume)) {
@@ -53,21 +57,29 @@ const storageResume = multer.diskStorage({
     //   cb(null, dir);
     // }
 
-    fs.unlinkSync(dir + resultFileName.dataValues.resume); /* hapus file sebelumnya */
+    fs.unlinkSync(
+      dir + resultFileName.dataValues.resume
+    ); /* hapus file sebelumnya */
     cb(null, dir);
   },
 
   // set filename using uuid (safety)
   filename: (req, file, cb) => {
     // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+    const fileName = path.basename(
+      uuidv4(file.originalname),
+      path.extname(file.originalname)
+    );
     cb(null, fileName + path.extname(file.originalname));
-  }
+  },
 });
 
 const storagePhoto = multer.diskStorage({
-  destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../../public/uploads/users/" + req.userId.id + "/photo/");
+  destination: async (req, file, cb) => {
+    const dir = path.join(
+      __dirname,
+      "../../../public/uploads/users/" + req.userId.id + "/photo/"
+    );
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -76,7 +88,7 @@ const storagePhoto = multer.diskStorage({
 
     const resultFileName = await Users.findOne({
       where: { id: req.userId.id },
-      attributes: ['photo'],
+      attributes: ["photo"],
     });
 
     // console.log(resultFileName.dataValues.photo);
@@ -85,9 +97,12 @@ const storagePhoto = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+    const fileName = path.basename(
+      uuidv4(file.originalname),
+      path.extname(file.originalname)
+    );
     cb(null, fileName + path.extname(file.originalname));
-  }
+  },
 });
 
 // make handler to file size
@@ -97,41 +112,45 @@ const fileSizeHandler = (error, req, res, next) => {
   }
 
   next();
-}
+};
 
 const uploadResume = multer({
-    storage: storageResume,
-    limits: {
-      fileSize: 1000000 /* 1 MB */
-    },
-    // filter file
-    fileFilter: (req, file, cb) => {
-      const extFile = path.extname(file.originalname);
-      const extFilter = '.pdf';
+  storage: storageResume,
+  limits: {
+    fileSize: 1000000 /* 1 MB */,
+  },
+  // filter file
+  fileFilter: (req, file, cb) => {
+    const extFile = path.extname(file.originalname);
+    const extFilter = ".pdf";
 
-      if (extFile !== extFilter) {
-        return cb(new Error("Resume yang diinput harus berbentuk PDF"))
-      }
-
-      cb(null, true);
+    if (extFile !== extFilter) {
+      return cb(new Error("Resume yang diinput harus berbentuk PDF"));
     }
+
+    cb(null, true);
+  },
 }).single("resume");
 
 const uploadPhoto = multer({
   storage: storagePhoto,
   limits: {
-    fileSize: 3000000 /* 3 MB */
+    fileSize: 3000000 /* 3 MB */,
   },
   fileFilter: (req, file, cb) => {
     const extFile = path.extname(file.originalname);
-    const extFilter = ['.jpg', '.jpeg', '.png'];
+    const extFilter = [".jpg", ".jpeg", ".png"];
 
     if (!extFilter.includes(extFile)) {
-      return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"))
+      return cb(
+        new Error(
+          "Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"
+        )
+      );
     }
 
     cb(null, true);
-  }
+  },
 }).single("photo");
 
 const route = express();
