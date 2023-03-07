@@ -1,6 +1,5 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
-const responseData = require("../../helpers/responseData");
 const {
   getDetailUser,
   deleteUser,
@@ -17,10 +16,9 @@ const {
   apply,
 } = require("./controller");
 const {
-  uploadResumeUser,
-  uploadPhotoUser,
   removeFileResumeUser,
-  removeFilePhotoUser
+  removeFilePhotoUser,
+  userUploadHandler
 } = require("../../helpers/uploadFile");
 
 const route = express();
@@ -33,26 +31,11 @@ route.delete("/user", auth, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);
-route.put("/user/resume", auth, (req, res, next) => {
-  uploadResumeUser(req, res, (error) => {
-    if (error) {
-      return res.status(400).send(responseData(400, null, error?.message, null));
-    }
-    // console.log(error);
-    next();
-  });
-}, removeFileResumeUser, createResume);
+route.put("/user/resume", auth, userUploadHandler, removeFileResumeUser, createResume);
 // route.delete("/user/resume/:id", auth, deleteResume);
 
 route.get("/user/photo", auth, getAllPhoto);
-route.put("/user/photo", auth, (req, res, next) => {
-  uploadPhotoUser(req, res, (error) => {
-    if (error) {
-      return res.status(400).send(responseData(400, null, error?.message, null));
-    }
-    next();
-  })
-}, removeFilePhotoUser, putPhoto);
+route.put("/user/photo", auth, userUploadHandler, removeFilePhotoUser, putPhoto);
 
 route.get("/user/apply", auth, getApply);
 route.post("/user/apply", auth, apply);
