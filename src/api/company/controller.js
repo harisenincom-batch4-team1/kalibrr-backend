@@ -60,6 +60,7 @@ const deleteCompany = async (req, res) => {
 const updateCompany = async (req, res) => {
   const id = checkToken(req);
   const { name, location, phone } = req.body;
+  const photo = req.file?.filename;
 
   try {
     const checkId = await Companies.findOne({
@@ -71,13 +72,6 @@ const updateCompany = async (req, res) => {
         .status(404)
         .send(responseData(404, "Akun perusahaan tidak ditemukan", null, null));
     }
-
-    const resultPhoto = await Companies.findOne({
-      where: { id },
-      attributes: ['photo']
-    });
-
-    const photo = req.file == undefined ? resultPhoto.dataValues.photo : req.file.filename;
 
     // if (!name || !location || !phone || !photo) {
     //   return res

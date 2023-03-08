@@ -232,7 +232,7 @@ const getAllResume = async (req, res) => {
 
 const createResume = async (req, res) => {
   const id = checkToken(req);
-  const resume = req.file.filename; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
+  const resume = req.file.filename; /* fungsi path dari multer, agar yg diinput adalah nama dari file nya (string) */
   try {
     const checkId = await Users.findOne({
       where: {
