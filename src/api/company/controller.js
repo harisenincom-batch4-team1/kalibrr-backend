@@ -60,7 +60,8 @@ const deleteCompany = async (req, res) => {
 const updateCompany = async (req, res) => {
   const id = checkToken(req);
   const { name, location, phone } = req.body;
-  const photo = req.file?.filename;
+  const photoPath = req.file?.path;
+  const photo = photoPath.split("\\").slice(-3).join("/");
 
   try {
     const checkId = await Companies.findOne({
