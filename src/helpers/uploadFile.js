@@ -4,6 +4,8 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
 const responseData = require("../helpers/responseData");
+const pathUser = path.join("../../public/uploads/users/");
+const pathCompany = path.join("../../public/uploads/companies/");
 
 // get the file name from database
 const resultFileNameUser = async (id) => {
@@ -24,9 +26,7 @@ const resultFileNameCompany = async (id) => {
 const storageResumeUser = multer.diskStorage({
   // set the directory to save resume file
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../public/uploads/users/" + req.globId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
-
-    req.dir = dir;
+    const dir = path.join(__dirname, pathUser + req.globId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
     // check the directory
     if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
@@ -48,9 +48,7 @@ const storageResumeUser = multer.diskStorage({
 // storage photo profile user
 const storagePhotoUser = multer.diskStorage({
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../public/uploads/users/" + req.globId.id + "/photo/");
-
-    req.dir = dir;
+    const dir = path.join(__dirname, pathUser + req.globId.id + "/photo/");
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -127,11 +125,12 @@ const userUploadHandler = (req, res, next) => {
 // remove previous resume user
 const removeFileResumeUser = async(req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
-  const resultDir = req.dir;
-  // console.log('hasil :',resultFile);
-  // console.log('hasil dir :',req.dir);
-  if (fs.existsSync(resultDir + resultFile.dataValues.resume)) {
-    fs.unlinkSync(resultDir + resultFile.dataValues.resume);
+  const resultDir = path.join(__dirname, pathUser);
+  const resultFilePath = (resultFile.dataValues.resume).replace(/\//g, "\\"); /* mengganti tanda "/" di database menjadi "\" */
+  // console.log('hasil :' , resultFile);
+  // console.log('hasil dir :' , resultDir + resultFilePath);
+  if (fs.existsSync(resultDir + resultFilePath)) {
+    fs.unlinkSync(resultDir + resultFilePath);
   }
 
   next();
@@ -140,11 +139,12 @@ const removeFileResumeUser = async(req, res, next) => {
 // remove previous resume user
 const removeFilePhotoUser = async(req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
-  const resultDir = req.dir;
-  // console.log('hasil :',resultFile);
-  // console.log('hasil dir :',req.dir);
-  if (fs.existsSync(resultDir + resultFile.dataValues.photo)) {
-    fs.unlinkSync(resultDir + resultFile.dataValues.photo);
+  const resultDir = path.join(__dirname, pathUser);
+  const resultFilePath = (resultFile.dataValues.photo).replace(/\//g, "\\");
+  // console.log('hasil :' , resultFile);
+  // console.log('hasil dir :' , resultDir + resultFilePath);
+  if (fs.existsSync(resultDir + resultFilePath)) {
+    fs.unlinkSync(resultDir + resultFilePath);
   }
 
   next();
@@ -153,9 +153,7 @@ const removeFilePhotoUser = async(req, res, next) => {
 // storage photo profile company
 const storagePhotoCompany = multer.diskStorage({
   destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, "../../public/uploads/companys/" + req.globId.id + "/photo/");
-
-    req.dir = dir;
+    const dir = path.join(__dirname, pathCompany + req.globId.id + "/photo/");
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -202,11 +200,12 @@ const companyUploadHandler = (req, res, next) => {
 
 const removeFilePhotoCompany = async(req, res, next) => {
   const resultFile = await resultFileNameCompany(req.globId.id);
-  const resultDir = req.dir;
-  // console.log('hasil: ' + resultFile);
-  // console.log('hasil dir :' + req.dir);
-  if (fs.existsSync(resultDir + resultFile.dataValues.photo)) {
-    fs.unlinkSync(resultDir + resultFile.dataValues.photo);
+  const resultDir = path.join(__dirname, pathCompany);
+  const resultFilePath = (resultFile.dataValues.photo).replace(/\//g, "\\");
+  // console.log('hasil: ' , resultFile);
+  // console.log('hasil dir :' , resultDir + resultFilePath);
+  if (fs.existsSync(resultDir + resultFilePath)) {
+    fs.unlinkSync(resultDir + resultFilePath);
   }
 
   next();
