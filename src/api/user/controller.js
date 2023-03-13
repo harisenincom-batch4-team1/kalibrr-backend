@@ -233,10 +233,8 @@ const getAllResume = async (req, res) => {
 
 const createResume = async (req, res) => {
   const id = checkToken(req);
-  /* fungsi path dari multer, agar yg diinput adalah nama dari file nya (string) */
   const resumePath = req.file.path;
   const resume = resumePath.split("\\").slice(-3).join("/");
-  console.log("resume: ", resume);
 
   try {
     const checkId = await Users.findOne({
