@@ -11,25 +11,29 @@ const pathCompany = path.join("../../public/uploads/companies/");
 const resultFileNameUser = async (id) => {
   return await Users.findOne({
     where: { id },
-    attributes: ['resume', 'photo'],
+    attributes: ["resume", "photo"],
   });
-}
+};
 
 const resultFileNameCompany = async (id) => {
   return await Companies.findOne({
     where: { id },
-    attributes: ['photo'],
+    attributes: ["photo"],
   });
-}
+};
 
 // storage resume user
 const storageResumeUser = multer.diskStorage({
   // set the directory to save resume file
-  destination: async (req, file, cb) => { 
-    const dir = path.join(__dirname, pathUser + req.globId.id + "/resume/"); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
+  destination: async (req, file, cb) => {
+    const dir = path.join(
+      __dirname,
+      pathUser + req.globId.id + "/resume/"
+    ); /* fungsi dari path join dirname untuk mengambil hasil dari posisi directory (string) */
 
     // check the directory
-    if (!fs.existsSync(dir)) { /* mengecek directorynya ada atau tidak (boolean) */
+    if (!fs.existsSync(dir)) {
+      /* mengecek directorynya ada atau tidak (boolean) */
       fs.mkdirSync(dir, { recursive: true }); /* membuat directory otomatis */
       return cb(null, dir);
     }
@@ -40,14 +44,17 @@ const storageResumeUser = multer.diskStorage({
   // set filename using uuid (safety)
   filename: (req, file, cb) => {
     // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+    const fileName = path.basename(
+      uuidv4(file.originalname),
+      path.extname(file.originalname)
+    );
     cb(null, fileName + path.extname(file.originalname));
-  }
+  },
 });
 
 // storage photo profile user
 const storagePhotoUser = multer.diskStorage({
-  destination: async (req, file, cb) => { 
+  destination: async (req, file, cb) => {
     const dir = path.join(__dirname, pathUser + req.globId.id + "/photo/");
 
     if (!fs.existsSync(dir)) {
@@ -60,73 +67,86 @@ const storagePhotoUser = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+    const fileName = path.basename(
+      uuidv4(file.originalname),
+      path.extname(file.originalname)
+    );
     cb(null, fileName + path.extname(file.originalname));
-  }
+  },
 });
 
 // upload resume user
 const uploadResumeUser = multer({
   storage: storageResumeUser,
   limits: {
-    fileSize: 1000000 /* 1 MB */
+    fileSize: 1000000 /* 1 MB */,
   },
   // filter file
   fileFilter: (req, file, cb) => {
     const extFile = path.extname(file.originalname);
-    const extFilter = '.pdf';
+    const extFilter = ".pdf";
 
     if (extFile !== extFilter) {
       return cb(new Error("Resume yang diinput harus berbentuk PDF"));
     }
 
     cb(null, true);
-  }
+  },
 }).single("resume");
 
 // upload photo profile user
 const uploadPhotoUser = multer({
   storage: storagePhotoUser,
   limits: {
-    fileSize: 3000000 /* 3 MB */
+    fileSize: 3000000 /* 3 MB */,
   },
   fileFilter: (req, file, cb) => {
     const extFile = path.extname(file.originalname);
-    const extFilter = ['.jpg', '.jpeg', '.png'];
+    const extFilter = [".jpg", ".jpeg", ".png", ".JPG", ".PNG", ".JPEG"];
 
     if (!extFilter.includes(extFile)) {
-      return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"));
+      return cb(
+        new Error(
+          "Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"
+        )
+      );
     }
 
     cb(null, true);
-  }
+  },
 }).single("photo");
 
 // upload user handler
 const userUploadHandler = (req, res, next) => {
-  if (req.route.path == '/user/resume') {
+  if (req.route.path == "/user/resume") {
     uploadResumeUser(req, res, (error) => {
       if (error) {
-        return res.status(400).send(responseData(400, null, error?.message, null));
+        return res
+          .status(400)
+          .send(responseData(400, null, error?.message, null));
       }
       next();
     });
-  }
-  else if (req.route.path == '/user/photo') {
+  } else if (req.route.path == "/user/photo") {
     uploadPhotoUser(req, res, (error) => {
       if (error) {
-        return res.status(400).send(responseData(400, null, error?.message, null));
+        return res
+          .status(400)
+          .send(responseData(400, null, error?.message, null));
       }
       next();
     });
   }
-}
+};
 
 // remove previous resume user
-const removeFileResumeUser = async(req, res, next) => {
+const removeFileResumeUser = async (req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
   const resultDir = path.join(__dirname, pathUser);
-  const resultFilePath = (resultFile.dataValues.resume).replace(/\//g, "\\"); /* mengganti tanda "/" di database menjadi "\" */
+  const resultFilePath = resultFile.dataValues.resume.replace(
+    /\//g,
+    "\\"
+  ); /* mengganti tanda "/" di database menjadi "\" */
   // console.log('hasil :' , resultFile);
   // console.log('hasil dir :' , resultDir + resultFilePath);
   if (fs.existsSync(resultDir + resultFilePath)) {
@@ -134,13 +154,13 @@ const removeFileResumeUser = async(req, res, next) => {
   }
 
   next();
-}
+};
 
 // remove previous resume user
-const removeFilePhotoUser = async(req, res, next) => {
+const removeFilePhotoUser = async (req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
   const resultDir = path.join(__dirname, pathUser);
-  const resultFilePath = (resultFile.dataValues.photo).replace(/\//g, "\\");
+  const resultFilePath = resultFile.dataValues.photo.replace(/\//g, "\\");
   // console.log('hasil :' , resultFile);
   // console.log('hasil dir :' , resultDir + resultFilePath);
   if (fs.existsSync(resultDir + resultFilePath)) {
@@ -148,11 +168,11 @@ const removeFilePhotoUser = async(req, res, next) => {
   }
 
   next();
-}
+};
 
 // storage photo profile company
 const storagePhotoCompany = multer.diskStorage({
-  destination: async (req, file, cb) => { 
+  destination: async (req, file, cb) => {
     const dir = path.join(__dirname, pathCompany + req.globId.id + "/photo/");
 
     if (!fs.existsSync(dir)) {
@@ -165,43 +185,52 @@ const storagePhotoCompany = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     // console.log(file);
-    const fileName = path.basename(uuidv4(file.originalname), path.extname(file.originalname))
+    const fileName = path.basename(
+      uuidv4(file.originalname),
+      path.extname(file.originalname)
+    );
     cb(null, fileName + path.extname(file.originalname));
-  }
+  },
 });
 
 // upload photo profile user
 const uploadPhotoCompany = multer({
   storage: storagePhotoCompany,
   limits: {
-    fileSize: 3000000 /* 3 MB */
+    fileSize: 3000000 /* 3 MB */,
   },
   fileFilter: (req, file, cb) => {
     const extFile = path.extname(file.originalname);
-    const extFilter = ['.jpg', '.jpeg', '.png'];
+    const extFilter = [".jpg", ".jpeg", ".png", ".JPG", ".PNG", ".JPEG"];
 
     if (!extFilter.includes(extFile)) {
-      return cb(new Error("Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"));
+      return cb(
+        new Error(
+          "Foto Profile yang diinput harus berbentuk JPG atau JPEG atau PNG"
+        )
+      );
     }
 
     cb(null, true);
-  }
+  },
 }).single("photo");
 
 // upload company handler
 const companyUploadHandler = (req, res, next) => {
   uploadPhotoCompany(req, res, (error) => {
     if (error) {
-      return res.status(400).send(responseData(400, null, error?.message, null));
+      return res
+        .status(400)
+        .send(responseData(400, null, error?.message, null));
     }
     next();
   });
-}
+};
 
-const removeFilePhotoCompany = async(req, res, next) => {
+const removeFilePhotoCompany = async (req, res, next) => {
   const resultFile = await resultFileNameCompany(req.globId.id);
   const resultDir = path.join(__dirname, pathCompany);
-  const resultFilePath = (resultFile.dataValues.photo).replace(/\//g, "\\");
+  const resultFilePath = resultFile.dataValues.photo.replace(/\//g, "\\");
   // console.log('hasil: ' , resultFile);
   // console.log('hasil dir :' , resultDir + resultFilePath);
   if (fs.existsSync(resultDir + resultFilePath)) {
@@ -209,12 +238,12 @@ const removeFilePhotoCompany = async(req, res, next) => {
   }
 
   next();
-}
+};
 
 module.exports = {
   userUploadHandler,
   companyUploadHandler,
   removeFileResumeUser,
   removeFilePhotoUser,
-  removeFilePhotoCompany
-}
+  removeFilePhotoCompany,
+};

@@ -54,7 +54,7 @@ const loginUser = async (req, res) => {
     if (!checkData) {
       return res
         .status(401)
-        .send(responseData(401, "Email salah", null, null));
+        .send(responseData(401, "Email atau password salah", null, null));
     }
 
     const checkPassword = await passwordCompare(password, checkData.password);
@@ -62,7 +62,7 @@ const loginUser = async (req, res) => {
     if (!checkPassword) {
       return res
         .status(401)
-        .send(responseData(401, "Password salah", null, null));
+        .send(responseData(401, "Email atau password salah", null, null));
     }
 
     const userData = {
