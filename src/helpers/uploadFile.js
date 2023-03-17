@@ -43,7 +43,6 @@ const storageResumeUser = multer.diskStorage({
 
   // set filename using uuid (safety)
   filename: (req, file, cb) => {
-    // console.log(file);
     const fileName = path.basename(
       uuidv4(file.originalname),
       path.extname(file.originalname)
@@ -62,11 +61,9 @@ const storagePhotoUser = multer.diskStorage({
       return cb(null, dir);
     }
 
-    // console.log(resultFileName.dataValues.photo);
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    // console.log(file);
     const fileName = path.basename(
       uuidv4(file.originalname),
       path.extname(file.originalname)
@@ -84,9 +81,13 @@ const uploadResumeUser = multer({
   // filter file
   fileFilter: (req, file, cb) => {
     const extFile = path.extname(file.originalname);
-    const extFilter = ".pdf";
+    const extFilter = [".pdf", ".PDF"];
 
-    if (extFile !== extFilter) {
+    // if (extFile !== extFilter) {
+
+    // }
+
+    if (!extFilter.includes(extFile)) {
       return cb(new Error("Resume yang diinput harus berbentuk PDF"));
     }
 
@@ -142,13 +143,14 @@ const userUploadHandler = (req, res, next) => {
 // remove previous resume user
 const removeFileResumeUser = async (req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
+  
   const resultDir = path.join(__dirname, pathUser);
-  const resultFilePath = resultFile.dataValues.resume.replace(
+  const resultFilePath = resultFile.dataValues?.resume?.replace(
     /\//g,
     "\\"
-  ); /* mengganti tanda "/" di database menjadi "\" */
-  // console.log('hasil :' , resultFile);
-  // console.log('hasil dir :' , resultDir + resultFilePath);
+  ); 
+  
+  /* mengganti tanda "/" di database menjadi "\" */
   if (fs.existsSync(resultDir + resultFilePath)) {
     fs.unlinkSync(resultDir + resultFilePath);
   }
@@ -160,9 +162,7 @@ const removeFileResumeUser = async (req, res, next) => {
 const removeFilePhotoUser = async (req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
   const resultDir = path.join(__dirname, pathUser);
-  const resultFilePath = resultFile.dataValues.photo.replace(/\//g, "\\");
-  // console.log('hasil :' , resultFile);
-  // console.log('hasil dir :' , resultDir + resultFilePath);
+  const resultFilePath = resultFile.dataValues.photo?.replace(/\//g, "\\");
   if (fs.existsSync(resultDir + resultFilePath)) {
     fs.unlinkSync(resultDir + resultFilePath);
   }
@@ -180,11 +180,9 @@ const storagePhotoCompany = multer.diskStorage({
       return cb(null, dir);
     }
 
-    // console.log(resultFileName.dataValues.photo);
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    // console.log(file);
     const fileName = path.basename(
       uuidv4(file.originalname),
       path.extname(file.originalname)
@@ -231,8 +229,7 @@ const removeFilePhotoCompany = async (req, res, next) => {
   const resultFile = await resultFileNameCompany(req.globId.id);
   const resultDir = path.join(__dirname, pathCompany);
   const resultFilePath = resultFile.dataValues.photo.replace(/\//g, "\\");
-  // console.log('hasil: ' , resultFile);
-  // console.log('hasil dir :' , resultDir + resultFilePath);
+
   if (fs.existsSync(resultDir + resultFilePath)) {
     fs.unlinkSync(resultDir + resultFilePath);
   }

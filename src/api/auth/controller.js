@@ -83,9 +83,10 @@ const loginUser = async (req, res) => {
 
 const registerCompany = async (req, res) => {
   try {
-    const { name, email, password, location, phone } = req.body;
+    const { name, email, password, passwordConfirm, location, phone } =
+      req.body;
     // const photo = req.file.filename;
-    if (!name, !password, !email, !location, !phone) {
+    if ((!name, !password, !passwordConfirm, !email, !location, !phone)) {
       return res
         .status(500)
         .send(responseData(500, "Data tidak boleh kosong", null, null));
@@ -101,13 +102,21 @@ const registerCompany = async (req, res) => {
         .send(responseData(500, "Email sudah digunakan", null, null));
     }
 
+    if (password !== passwordConfirm) {
+      return res
+        .status(500)
+        .send(
+          responseData(500, "Konfirmasi kata sandi tidak cocok", null, null)
+        );
+    }
+
     const passwordHash = await passwordHashing(password);
     await Companies.create({
       name,
       email,
       password: passwordHash,
       location,
-      phone
+      phone,
     });
 
     return res
@@ -159,6 +168,6 @@ const loginCompany = async (req, res) => {
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }
-}
+};
 
 module.exports = { registerUser, loginUser, registerCompany, loginCompany };
