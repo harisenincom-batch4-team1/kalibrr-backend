@@ -2,7 +2,6 @@ const { Jobs, Companies, JobApplications, Users } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordHashing = require("../../helpers/passwordHashing");
-const passwordCompare = require("../../helpers/passwordCompare");
 
 const getDetailCompany = async (req, res) => {
   try {
