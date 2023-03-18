@@ -228,7 +228,7 @@ const companyUploadHandler = (req, res, next) => {
 const removeFilePhotoCompany = async (req, res, next) => {
   const resultFile = await resultFileNameCompany(req.globId.id);
   const resultDir = path.join(__dirname, pathCompany);
-  const resultFilePath = resultFile.dataValues.photo.replace(/\//g, "\\");
+  const resultFilePath = resultFile.dataValues.photo?.replace(/\//g, "\\");
 
   if (fs.existsSync(resultDir + resultFilePath)) {
     fs.unlinkSync(resultDir + resultFilePath);
