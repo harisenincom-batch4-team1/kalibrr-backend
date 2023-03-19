@@ -143,13 +143,10 @@ const userUploadHandler = (req, res, next) => {
 // remove previous resume user
 const removeFileResumeUser = async (req, res, next) => {
   const resultFile = await resultFileNameUser(req.globId.id);
-  
+
   const resultDir = path.join(__dirname, pathUser);
-  const resultFilePath = resultFile.dataValues?.resume?.replace(
-    /\//g,
-    "\\"
-  ); 
-  
+  const resultFilePath = resultFile.dataValues?.resume?.replace(/\//g, "\\");
+
   /* mengganti tanda "/" di database menjadi "\" */
   if (fs.existsSync(resultDir + resultFilePath)) {
     fs.unlinkSync(resultDir + resultFilePath);
@@ -237,10 +234,46 @@ const removeFilePhotoCompany = async (req, res, next) => {
   next();
 };
 
+// remove directory when user delete account
+const removeDir = async (req, res, next) => {
+  const resultDir = path.join(__dirname, pathUser);
+  fs.rmdir(
+    resultDir + req.globId.id,
+    { recursive: true, force: true },
+    (err) => {
+      if (err) {
+        return console.log("error occurred in deleting directory", err);
+      }
+      console.log("Directory deleted successfully");
+    }
+  );
+
+  next();
+};
+
+// remove directory when company delete account
+const removeDirCompany = async (req, res, next) => {
+  const resultDir = path.join(__dirname, pathCompany);
+  fs.rmdir(
+    resultDir + req.globId.id,
+    { recursive: true, force: true },
+    (err) => {
+      if (err) {
+        return console.log("error occurred in deleting directory", err);
+      }
+      console.log("Directory deleted successfully");
+    }
+  );
+
+  next();
+};
+
 module.exports = {
   userUploadHandler,
   companyUploadHandler,
   removeFileResumeUser,
   removeFilePhotoUser,
   removeFilePhotoCompany,
+  removeDir,
+  removeDirCompany
 };

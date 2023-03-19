@@ -18,7 +18,8 @@ const {
 const {
   removeFileResumeUser,
   removeFilePhotoUser,
-  userUploadHandler
+  userUploadHandler,
+  removeDir
 } = require("../../helpers/uploadFile");
 
 const route = express();
@@ -27,7 +28,7 @@ route.get("/user", auth, getDetailUser);
 route.put("/user", auth, updateUser);
 route.put("/user-email", auth, updateEmailUser);
 route.put("/user-password", auth, updatePasswordUser);
-route.delete("/user", auth, deleteUser);
+route.delete("/user", auth, removeDir, deleteUser);
 
 route.get("/user/resume", auth, getAllResume); /* id */
 // route.get("/user/resume/:id", auth, getOneResume);

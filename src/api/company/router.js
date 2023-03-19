@@ -16,7 +16,8 @@ const {
 } = require("./controller");
 const {
   removeFilePhotoCompany,
-  companyUploadHandler
+  companyUploadHandler,
+  removeDirCompany
 } = require("../../helpers/uploadFile");
 
 const route = express();
@@ -25,7 +26,7 @@ route.get("/company", auth, getDetailCompany);
 route.put("/company", auth, companyUploadHandler, removeFilePhotoCompany, updateCompany);
 route.put("/company-email", auth, updateEmailCompany);
 route.put("/company-password", auth, updatePasswordCompany);
-route.delete("/company", auth, deleteCompany);
+route.delete("/company", auth, removeDirCompany, deleteCompany);
 
 route.get("/company-job", auth, getAllJob);
 route.get("/company-job/:id", auth, getOneJob);
