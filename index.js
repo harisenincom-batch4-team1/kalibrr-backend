@@ -50,6 +50,12 @@ app.use(v1, authRoute);
 app.use(v1, userRoute);
 app.use(v1, companyRoute);
 
+app.use(express.static("public"));
+app.use((_, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+app.use("/static", express.static("public"));
+
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
 });
