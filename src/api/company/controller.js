@@ -18,7 +18,7 @@ const getDetailCompany = async (req, res) => {
         .send(responseData(404, "Perusahaan tidak ditemukan", null, null));
     }
 
-    const result = await Companies.findAll({
+    const result = await Companies.findOne({
       where: { id },
       include: [
         {
@@ -385,24 +385,13 @@ const updateJob = async (req, res) => {
 const getUserApply = async (req, res) => {
   const id = checkToken(req);
   try {
-    const result = await Jobs.findAll({
-      where: { companyId: id },
+    const result = await JobApplications.findAll({
       include: [
-        {
-          model: JobApplications,
-          required: true,
-          include: [
-            {
-              model: Users,
-              required: true,
-              attributes: {
-                exclude: ["password"],
-              },
-            },
-          ],
-        },
+        { model: Jobs, where: { companyId: id }, required: true },
+        { model: Users, required: true, attributes: { exclude: ["password"] } },
       ],
     });
+
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));

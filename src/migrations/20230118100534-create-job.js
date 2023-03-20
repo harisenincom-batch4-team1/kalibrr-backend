@@ -13,6 +13,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "Companies", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       name: {
         type: Sequelize.STRING,
@@ -32,17 +34,17 @@ module.exports = {
       },
       salaryMin: {
         type: Sequelize.BIGINT,
-        allowNull: false
+        allowNull: false,
       },
       salaryMax: {
         type: Sequelize.BIGINT,
-        allowNull: false
+        allowNull: false,
       },
       jobDescription: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       jobQualification: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       createdAt: {
         allowNull: false,
