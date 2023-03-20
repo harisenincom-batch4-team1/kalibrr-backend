@@ -60,7 +60,7 @@ const deleteCompany = async (req, res) => {
 
 const updateCompany = async (req, res) => {
   const id = checkToken(req);
-  const { name, location, phone } = req.body;
+  const { name, location, email, phone } = req.body;
   const photoPath = req.file?.path;
   const photo = photoPath.split("\\").slice(-3).join("/");
 
@@ -83,6 +83,7 @@ const updateCompany = async (req, res) => {
 
     const values = {
       name,
+      email,
       location,
       phone,
       photo,
