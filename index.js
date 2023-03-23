@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const port = process.env.APP_PORT || 9000;
@@ -7,6 +8,8 @@ const port = process.env.APP_PORT || 9000;
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+app.use("/static", express.static("public"));
 
 const v1 = "/api/v1";
 const publicRoute = require("./src/api/public/router");

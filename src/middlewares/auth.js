@@ -19,7 +19,6 @@ const auth = (req, res, next) => {
     }
 
     const decodeToken = jwt.decode(token);
-    // console.log(decodeToken);
     
     req.globId = decodeToken;
 

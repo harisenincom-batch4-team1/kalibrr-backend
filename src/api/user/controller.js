@@ -17,6 +17,7 @@ const getDetailUser = async (req, res) => {
         "phone",
         "role",
         "linkedinUrl",
+        "resume",
         "photo",
         "skill",
         "createdAt",
@@ -210,7 +211,7 @@ const getAllResume = async (req, res) => {
   try {
     const result = await Users.findOne({
       where: { id: id },
-      attributes: ['resume'],
+      attributes: ["resume"],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
@@ -232,12 +233,15 @@ const getAllResume = async (req, res) => {
 
 const createResume = async (req, res) => {
   const id = checkToken(req);
-  const resume = req.file.filename; /* fungsi path dari multer, agar yg diinput adalah path directory nya (string) */
+  /* fungsi path dari multer, agar yg diinput adalah nama dari file nya (string) */
+  const resumePath = req.file.path;
+  const resume = resumePath.split("\\").slice(-3).join("/");
+
   try {
     const checkId = await Users.findOne({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
 
     if (!checkId) {
@@ -294,12 +298,13 @@ const createResume = async (req, res) => {
 
 const putPhoto = async (req, res) => {
   const id = checkToken(req);
-  const photo = req.file.filename;
+  const photoPath = req.file.path;
+  const photo = photoPath.split("\\").slice(-3).join("/");
   try {
     const checkId = await Users.findOne({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
 
     if (!checkId) {
@@ -341,7 +346,7 @@ const getAllPhoto = async (req, res) => {
   try {
     const result = await Users.findOne({
       where: { id: id },
-      attributes: ['photo'],
+      attributes: ["photo"],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
@@ -352,20 +357,31 @@ const getAllPhoto = async (req, res) => {
 const getApply = async (req, res) => {
   const id = checkToken(req);
   try {
-    const checkResume = await JobApplications.findOne({ where: { userId: id } });
+    const checkResume = await JobApplications.findOne({
+      where: { userId: id },
+    });
     if (!checkResume) {
-      return res.status(500).send(responseData(500, "Kamu belum melamar dimanapun", null, []));
+      return res
+        .status(200)
+        .send(responseData(200, "Kamu belum melamar dimanapun", null, []));
     }
     const result = await JobApplications.findAll({
       where: { userId: checkResume.userId },
-      include: [{
-        model: Jobs,
-        required: true,
-        include: [{
-          model: Companies,
-          required: true
-        }]
-      }]
+      include: [
+        {
+          model: Jobs,
+          required: true,
+          include: [
+            {
+              model: Companies,
+              required: true,
+              attributes: {
+                exclude: ["password"],
+              },
+            },
+          ],
+        },
+      ],
     });
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
@@ -388,7 +404,6 @@ const apply = async (req, res) => {
     const checkJob = await Jobs.findOne({
       where: { id: jobId },
     });
-    // console.log("job id: ", checkJob?.id);
     if (!checkJob) {
       return res
         .status(404)

@@ -1,11 +1,12 @@
-const { Jobs, Companies, JobApplications } = require("../../models");
+const { Jobs, Companies, JobApplications, Users } = require("../../models");
 const responseData = require("../../helpers/responseData");
 const checkToken = require("../../helpers/checkToken");
 const passwordHashing = require("../../helpers/passwordHashing");
+const passwordCompare = require("../../helpers/passwordCompare");
 
 const getDetailCompany = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = checkToken(req);
 
     const checkCompany = await Companies.findOne({
       where: { id },
@@ -17,7 +18,7 @@ const getDetailCompany = async (req, res) => {
         .send(responseData(404, "Perusahaan tidak ditemukan", null, null));
     }
 
-    const result = await Companies.findAll({
+    const result = await Companies.findOne({
       where: { id },
       include: [
         {
@@ -59,7 +60,9 @@ const deleteCompany = async (req, res) => {
 
 const updateCompany = async (req, res) => {
   const id = checkToken(req);
-  const { name, location, phone, photo } = req.body;
+  const { name, location, phone } = req.body;
+  const photoPath = req.file?.path;
+  const photo = photoPath.split("\\").slice(-3).join("/");
 
   try {
     const checkId = await Companies.findOne({
@@ -72,11 +75,11 @@ const updateCompany = async (req, res) => {
         .send(responseData(404, "Akun perusahaan tidak ditemukan", null, null));
     }
 
-    if (!name || !location || !phone || !photo) {
-      return res
-        .status(201)
-        .send(responseData(201, "Data tidak boleh kosong", null, null));
-    }
+    // if (!name || !location || !phone || !photo) {
+    //   return res
+    //     .status(201)
+    //     .send(responseData(201, "Data tidak boleh kosong", null, null));
+    // }
 
     const values = {
       name,
@@ -380,12 +383,15 @@ const updateJob = async (req, res) => {
 };
 
 const getUserApply = async (req, res) => {
+  const id = checkToken(req);
   try {
-    const id = checkToken(req);
-    const result = await Jobs.findAll({
-      where: { companyId: id },
-      include: [JobApplications],
+    const result = await JobApplications.findAll({
+      include: [
+        { model: Jobs, where: { companyId: id }, required: true },
+        { model: Users, required: true, attributes: { exclude: ["password"] } },
+      ],
     });
+
     return res.status(200).send(responseData(200, "OK", null, result));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
@@ -407,7 +413,9 @@ const updateApplyStatus = async (req, res) => {
     };
     await JobApplications.update(values, selector);
 
-    return res.status(201).send(responseData(200, "Berhasil update status pelamar", null, null))
+    return res
+      .status(201)
+      .send(responseData(200, "Berhasil update status pelamar", null, null));
   } catch (error) {
     return res.status(500).send(responseData(500, null, error?.message, null));
   }

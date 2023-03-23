@@ -13,11 +13,15 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "Users", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       jobId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "Jobs", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       status: {
         type: Sequelize.ENUM,
